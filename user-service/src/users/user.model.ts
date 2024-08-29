@@ -1,5 +1,5 @@
-import { Model } from "sequelize";
-import { Column, DataType, Default, PrimaryKey, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, Default, ForeignKey, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { Account } from "src/account/account.model";
 
 @Table({
     tableName: 'users',
@@ -28,6 +28,16 @@ export class User extends Model<User> {
         allowNull: true,
     })
     nickname: string;
+
+    @ForeignKey(() => Account)
+    @Column({
+        type: DataType.UUID,
+        allowNull: true
+    })
+    accountId: string
+
+    @BelongsTo(() => Account)
+    account: Account
 
     @Column({
         type: DataType.DATE,
