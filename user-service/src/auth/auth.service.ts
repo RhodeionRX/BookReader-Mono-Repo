@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { AccountService } from 'src/account/account.service';
 import { RegisterRequest } from './models/request/register.request';
 import { UserService } from 'src/users/users.service';
@@ -23,7 +28,8 @@ export class AuthService {
       password: hashPassword,
     });
 
-    if (!account) throw new Error('Account was not created');
+    if (!account)
+      throw new HttpException('Account was not created', HttpStatus.NOT_FOUND);
 
     const user = await this.userService.create({
       name: dto.name,
@@ -32,7 +38,8 @@ export class AuthService {
       accountId: account.id,
     });
 
-    if (!user) throw new Error('User was not created');
+    if (!user)
+      throw new HttpException('User was not created', HttpStatus.NOT_FOUND);
 
     const token = await this.generateJwt(account);
 
