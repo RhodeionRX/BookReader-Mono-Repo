@@ -1,9 +1,19 @@
-import { Table, Column, Model, DataType, PrimaryKey, Default, HasMany, HasOne } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  Default,
+  HasMany,
+  HasOne,
+  AllowNull,
+} from 'sequelize-typescript';
 import { User } from 'src/users/user.model';
 
 @Table({
   tableName: 'accounts',
-  timestamps: true, 
+  timestamps: true,
 })
 export class Account extends Model<Account> {
   @PrimaryKey
@@ -14,6 +24,7 @@ export class Account extends Model<Account> {
   @Column({
     type: DataType.TEXT,
     allowNull: false,
+    unique: true,
   })
   login: string;
 
@@ -26,11 +37,18 @@ export class Account extends Model<Account> {
   @Column({
     type: DataType.TEXT,
     allowNull: false,
+    unique: true,
   })
   email: string;
 
-  @HasMany(() => User)
-  users: User[];
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+  })
+  emailConfirmed: boolean;
+
+  @HasOne(() => User)
+  user: User;
 
   @Column({
     type: DataType.DATE,
