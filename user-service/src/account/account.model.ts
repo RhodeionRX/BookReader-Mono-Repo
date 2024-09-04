@@ -43,7 +43,8 @@ export class Account extends Model<Account> {
 
   @Column({
     type: DataType.BOOLEAN,
-    allowNull: true,
+    allowNull: false,
+    defaultValue: false,
   })
   emailConfirmed: boolean;
 

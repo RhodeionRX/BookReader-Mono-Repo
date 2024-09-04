@@ -26,7 +26,8 @@ module.exports = {
       },
       emailConfirmed: {
         type: Sequelize.BOOLEAN,
-        allowNull: true,
+        allowNull: false,
+        defaultValue: false,
       },
       createdAt: {
         type: Sequelize.DATE,
