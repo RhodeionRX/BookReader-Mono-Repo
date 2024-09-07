@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAccountDto } from './models/dto/create-account.dto';
-import { AccountFindParams } from './models/dto/account-find-params.dto';
+import { AccountSearchParams } from './models/dto/account-search-params.dto';
 import { Account } from './account.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/users/user.model';
@@ -16,7 +16,7 @@ export class AccountService {
     return account;
   }
 
-  public async getAll(params: AccountFindParams) {
+  public async getAll(params: AccountSearchParams) {
     const whereClause: any = {};
 
     if (params.email) whereClause.email = params.email;

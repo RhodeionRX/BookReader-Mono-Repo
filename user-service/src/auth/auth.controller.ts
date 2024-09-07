@@ -8,7 +8,7 @@ import { MessagePattern } from '@nestjs/microservices';
 export class AuthController {
   constructor(private service: AuthService) {}
 
-  @MessagePattern({ cmd: 'register' })
+  @MessagePattern('register')
   public async register(registerDto: RegisterDto): Promise<TokenResponse> {
     return await this.service.register(registerDto);
   }

@@ -1,4 +1,4 @@
-export class AccountFindParams {
+export class AccountSearchParams {
   email?: string;
   login?: string;
 }

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   HttpCode,
+  HttpException,
   HttpStatus,
   Inject,
   Post,
@@ -9,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { RegisterRequest } from './models/request/register.request';
 import { ClientProxy } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +24,21 @@ export class AuthController {
   public async register(
     @Body() registerRequest: RegisterRequest,
   ): Promise<Observable<any>> {
-    return this.userServiceClient.send({ cmd: 'register' }, registerRequest);
+    return this.userServiceClient.send('register', registerRequest).pipe(
+      catchError((error) => {
+        console.log(error);
+
+        return throwError(
+          () =>
+            new HttpException(
+              {
+                status: HttpStatus.BAD_REQUEST,
+                message: error.message || 'Registration failed',
+              },
+              HttpStatus.BAD_REQUEST,
+            ),
+        );
+      }),
+    );
   }
 }
