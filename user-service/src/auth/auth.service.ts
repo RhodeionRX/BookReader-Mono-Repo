@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { AccountService } from 'src/account/account.service';
-import { RegisterDto } from './models/request/register.request';
+import { RegisterDto } from './models/dto/register.dto';
 import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Account } from 'src/account/account.model';

@@ -26,8 +26,6 @@ export class AuthController {
   ): Promise<Observable<any>> {
     return this.userServiceClient.send('register', registerRequest).pipe(
       catchError((error) => {
-        console.log(error);
-
         return throwError(
           () =>
             new HttpException(
