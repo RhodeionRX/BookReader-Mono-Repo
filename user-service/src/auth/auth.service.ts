@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { AccountService } from 'src/account/account.service';
-import { RegisterRequest } from './models/request/register.request';
+import { RegisterDto } from './models/request/register.request';
 import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Account } from 'src/account/account.model';
@@ -21,8 +21,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  public async register(dto: RegisterRequest) {
-    console.log(dto);
+  public async register(dto: RegisterDto) {
+    //TODO add find account
     const hashPassword = await bcrypt.hash(dto.password, 10);
     const account = await this.accountService.create({
       email: dto.email,

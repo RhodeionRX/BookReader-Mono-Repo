@@ -4,8 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
-import { APP_FILTER } from '@nestjs/core';
-import { ValidationExceptionFilter } from './filters/validation-exception.filter';
+import { MailerModule } from './mailer/mailer.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -17,12 +17,7 @@ import { ValidationExceptionFilter } from './filters/validation-exception.filter
     UsersModule,
     AccountModule,
     AuthModule,
-  ],
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: ValidationExceptionFilter,
-    },
+    MailerModule,
   ],
 })
 export class AppModule {}
