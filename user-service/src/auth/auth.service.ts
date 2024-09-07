@@ -12,6 +12,7 @@ import { Account } from 'src/account/account.model';
 import { AccountResponse } from 'src/account/models/response/account.response';
 import { JwtService } from '@nestjs/jwt';
 import { TokenResponse } from './models/response/token.response';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -22,15 +23,23 @@ export class AuthService {
   ) {}
 
   public async register(dto: RegisterDto) {
-    //TODO add find account
+    const accountCandidates = await this.accountService.getAll({
+      email: dto.email,
+    });
+
+    if (accountCandidates.accounts.length > 0) {
+      throw new RpcException(
+        'Account with specified creditials already exists',
+      );
+    }
+
     const hashPassword = await bcrypt.hash(dto.password, 10);
     const account = await this.accountService.create({
       email: dto.email,
       password: hashPassword,
     });
 
-    if (!account)
-      throw new HttpException('Account was not created', HttpStatus.NOT_FOUND);
+    if (!account) throw new RpcException('Account was not created');
 
     const user = await this.userService.create({
       name: dto.name,
@@ -39,8 +48,7 @@ export class AuthService {
       accountId: account.id,
     });
 
-    if (!user)
-      throw new HttpException('User was not created', HttpStatus.NOT_FOUND);
+    if (!user) throw new RpcException('User was not created');
 
     const token = await this.generateJwt(account);
 
