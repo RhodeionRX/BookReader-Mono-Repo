@@ -6,13 +6,17 @@ import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/users/user.model';
 import { AccountResponse } from './models/response/account.response';
 import { AccountsResponse } from './models/response/accounts.response';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class AccountService {
   constructor(@InjectModel(Account) private repository: typeof Account) {}
 
-  public async create(dto: CreateAccountDto) {
-    const account = await this.repository.create({ ...dto, login: dto.email });
+  public async create(dto: CreateAccountDto, transaction?: Transaction) {
+    const account = await this.repository.create(
+      { ...dto, login: dto.email },
+      transaction && { transaction },
+    );
     return account;
   }
 
