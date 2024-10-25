@@ -1,16 +1,15 @@
-version: "3.8"
 services:
-  postgres:
+  user_db:
     image: postgres:latest
     container_name: postgres-database
     ports:
-      - "${DB_PORT}:5432"
+      - "${USER_DB_PORT}:5432"
     environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${USER_DB_USERNAME}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
+      POSTGRES_DB: ${USER_DB_NAME}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - user_db:/var/lib/postgresql/data
 
   rabbitmq:
     image: rabbitmq:management
@@ -26,5 +25,5 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
-  postgres_data:
+  user_db:
   rabbitmq_data:

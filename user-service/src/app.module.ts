@@ -4,8 +4,6 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AccountModule } from './account/account.module';
 import { AuthModule } from './auth/auth.module';
-import { MailerModule } from './mailer/mailer.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -17,7 +15,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     UsersModule,
     AccountModule,
     AuthModule,
-    MailerModule,
   ],
 })
 export class AppModule {}
