@@ -4,6 +4,7 @@ import { User } from './user.model';
 import { CreateUserDto } from './models/dto/create-user-dto';
 import { UserResponse } from './models/response/user.response';
 import { Transaction } from 'sequelize';
+import { GetUserDto } from './models/dto/get-user-dto';
 
 @Injectable()
 export class UserService {
@@ -15,5 +16,13 @@ export class UserService {
       transaction && { transaction },
     );
     return new UserResponse(user);
+  }
+
+  public async getOne(dto: GetUserDto) {
+    const selection = {}
+
+    const user = await this.repository.findOne(selection)
+
+    return user;
   }
 }
