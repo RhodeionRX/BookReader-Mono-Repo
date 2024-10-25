@@ -11,6 +11,7 @@ import {
 import { RegisterRequest } from './models/request/register.request';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, Observable, throwError } from 'rxjs';
+import { AuthorizeRequest } from './models/request/authorize.request';
 
 @Controller('auth')
 export class AuthController {
@@ -36,6 +37,26 @@ export class AuthController {
               HttpStatus.BAD_REQUEST,
             ),
         );
+      }),
+    );
+  }
+
+  @Version('1')
+  @HttpCode(HttpStatus.OK)
+  @Post('authorize')
+  public async authorize(
+    @Body() authorizeRequest: AuthorizeRequest
+  ): Promise<Observable<any>> {
+    return this.userServiceClient.send('authorize', authorizeRequest).pipe(
+      catchError((error) => {
+        return throwError(() => 
+          new HttpException(
+            {
+              status: HttpStatus.BAD_REQUEST,
+              message: error.message || 'Authorization failed',
+            },
+            HttpStatus.BAD_REQUEST
+          ));
       }),
     );
   }

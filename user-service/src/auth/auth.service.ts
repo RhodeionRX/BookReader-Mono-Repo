@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { TokenResponse } from './models/response/token.response';
 import { RpcException } from '@nestjs/microservices';
 import { Sequelize } from 'sequelize-typescript';
+import { AuthorizeDto } from './models/dto/authorize.dto';
 
 @Injectable()
 export class AuthService {
@@ -63,6 +64,36 @@ export class AuthService {
       throw new RpcException(err.message || 'Registration failed');
     }
   }
+
+  public async authorize(dto: AuthorizeDto): Promise<TokenResponse> {
+    try {
+      const {login, email, password} = dto
+
+      if (!login && !email) {
+        throw new RpcException(
+          'No login or email is provided in the request',
+        );
+      }
+
+      const account = await this.accountService.getOne(dto);
+      if (!account) {
+        throw new RpcException('Wrong login or password');
+      }
+
+      const isCorrectPassword = bcrypt.compareSync(password, account.password);
+
+      if (!isCorrectPassword) {
+        throw new RpcException('Wrong login or password');
+      }
+      const token = await this.generateJwt(account);
+
+      return new TokenResponse(token);
+    }
+    catch (err) {
+      throw new RpcException(err.message || 'Authorization failed');
+    }
+  }
+
 
   private async generateJwt(account: Account | AccountResponse) {
     const payload = {
