@@ -7,11 +7,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
+  const BROKER_HOST = configService.get<string>('BROKER_HOST');
+  const BROKER_PORT = configService.get<string>('BROKER_PORT');
+
   const microservice = app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
       urls: [
-        `${configService.get<string>('BROKER_HOST')}:${configService.get<string>('BROKER_PORT')}`,
+        `${BROKER_HOST}:${BROKER_PORT}`,
       ],
       queue: 'user_queue',
       queueOptions: {
