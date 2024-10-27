@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config';
             urls: [
               `${configService.get<string>('BROKER_HOST')}:${configService.get<string>('BROKER_PORT')}`,
             ],
-            queue: 'user_queue',
+            queue: 'catalogue_queue',
             queueOptions: {
               durable: false,
             },
