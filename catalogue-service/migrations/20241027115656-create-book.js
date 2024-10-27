@@ -11,7 +11,7 @@ module.exports = {
         type: Sequelize.UUID,
       },
       creator_account_id: {
-        type: Sequelize.TEXT,
+        type: Sequelize.UUID,
         allowNull: true,
       },
       articul: {
