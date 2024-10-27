@@ -3,7 +3,7 @@ services:
     image: postgres:latest
     container_name: user-db
     ports:
-      - "${USER_DB_PORT}:5433"
+      - "${USER_DB_PORT}:5432"
     environment:
       POSTGRES_USER: ${USER_DB_USERNAME}
       POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
@@ -15,7 +15,7 @@ services:
     image: postgres:latest
     container_name: catalogue-db
     ports:
-      - "${CATALOGUE_DB_PORT}:5434"
+      - "${CATALOGUE_DB_PORT}:5432"
     environment:
       POSTGRES_USER: ${CATALOGUE_DB_USERNAME}
       POSTGRES_PASSWORD: ${CATALOGUE_DB_PASSWORD}
