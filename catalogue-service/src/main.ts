@@ -16,7 +16,7 @@ async function bootstrap() {
       urls: [
         `${BROKER_HOST}:${BROKER_PORT}`,
       ],
-      queue: 'user_queue',
+      queue: 'catalogue_queue',
       queueOptions: {
         durable: false,
       },
