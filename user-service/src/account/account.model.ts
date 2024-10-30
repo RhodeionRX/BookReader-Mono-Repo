@@ -5,9 +5,7 @@ import {
   DataType,
   PrimaryKey,
   Default,
-  HasMany,
   HasOne,
-  AllowNull,
 } from 'sequelize-typescript';
 import { User } from 'src/users/user.model';
 

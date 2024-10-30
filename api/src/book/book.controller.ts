@@ -11,6 +11,7 @@ import {
   HttpStatus,
   Version,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { InitBookRequest } from './models/requests/init-book.request';
 import { UpdateBookDto } from './models/update-book.dto';
