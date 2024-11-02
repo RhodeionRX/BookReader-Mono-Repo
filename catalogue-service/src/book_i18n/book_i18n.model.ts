@@ -1,11 +1,12 @@
 import { I18nEnum } from 'enums/i18n.enum';
-import { Model } from 'sequelize';
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
   PrimaryKey,
   Table,
+  Model,
 } from 'sequelize-typescript';
 import { Book } from 'src/book/book.model';
 
@@ -28,6 +29,9 @@ export class BookI18n extends Model<BookI18n> {
     allowNull: false,
   })
   bookId: string;
+
+  @BelongsTo(() => Book)
+  book: Book;
 
   @Column({
     type: DataType.STRING(100),

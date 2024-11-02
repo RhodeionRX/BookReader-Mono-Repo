@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBookI18nDto } from './dto/create-book_i18n.dto';
 import { UpdateBookI18nDto } from './dto/update-book_i18n.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { BookI18n } from './book_i18n.model';
 
 @Injectable()
 export class BookI18nService {
-  create(createBookI18nDto: CreateBookI18nDto) {
-    return 'This action adds a new bookI18n';
+  constructor(@InjectModel(BookI18n) private repository: typeof BookI18n) {}
+
+  public async create(dto: CreateBookI18nDto) {
+    const bookI18n = await this.repository.create(dto);
+    return bookI18n;
   }
 
   findAll() {

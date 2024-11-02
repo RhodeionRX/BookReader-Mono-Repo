@@ -9,6 +9,6 @@ export class BookController {
 
   @MessagePattern('init')
   public async init(initBookDto: InitBookDto): Promise<any> {
-    return initBookDto;
+    return this.service.create(initBookDto);
   }
 }
