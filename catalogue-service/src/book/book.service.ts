@@ -32,7 +32,10 @@ export class BookService {
         description,
       });
 
-      const response = { ...book, translations: bookI18n };
+      const response = {
+        book,
+        translations: [bookI18n],
+      };
 
       return response;
     } catch (error) {
