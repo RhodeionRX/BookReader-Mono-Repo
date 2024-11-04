@@ -21,4 +21,10 @@ export class BookController {
     const response = await this.service.getAll(dto);
     return new AllBooksResponse(response);
   }
+
+  @MessagePattern('getOne')
+  public async getOne(id: string): Promise<BookResponse> {
+    const response = await this.service.getOne(id);
+    return new BookResponse(response);
+  }
 }

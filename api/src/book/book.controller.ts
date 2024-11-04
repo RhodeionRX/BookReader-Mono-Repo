@@ -49,7 +49,7 @@ export class BookController {
               new HttpException(
                 {
                   status: HttpStatus.BAD_REQUEST,
-                  message: error.message || 'Book creation error',
+                  message: error.message || 'Unknown error',
                 },
                 HttpStatus.BAD_REQUEST,
               ),
@@ -71,7 +71,7 @@ export class BookController {
             new HttpException(
               {
                 status: HttpStatus.BAD_REQUEST,
-                message: error.message || 'Book creation error',
+                message: error.message || 'Unknown error',
               },
               HttpStatus.BAD_REQUEST,
             ),
@@ -80,8 +80,25 @@ export class BookController {
     );
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {}
+  @Version('1')
+  @HttpCode(HttpStatus.OK)
+  @Get('/:id')
+  public async findOne(@Param('id') id: string) {
+    return this.catalogueServiceClient.send('getOne', id).pipe(
+      catchError((error) => {
+        return throwError(
+          () =>
+            new HttpException(
+              {
+                status: HttpStatus.BAD_REQUEST,
+                message: error.message || 'Unknown error',
+              },
+              HttpStatus.BAD_REQUEST,
+            ),
+        );
+      }),
+    );
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {}

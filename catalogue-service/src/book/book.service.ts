@@ -80,4 +80,12 @@ export class BookService {
 
     return books;
   }
+
+  public async getOne(id: string) {
+    const book = await this.repository.findByPk(id, {
+      include: [{ model: BookI18n }],
+    });
+
+    return book;
+  }
 }
