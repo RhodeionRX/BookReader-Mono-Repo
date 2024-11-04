@@ -68,6 +68,12 @@ export class BookController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {}
 
+  @Version('1')
+  @HttpCode(HttpStatus.OK)
   @Delete(':id')
-  remove(@Param('id') id: string) {}
+  public async remove(@Param('id') id: string) {
+    return this.catalogueServiceClient
+      .send('destroy', id)
+      .pipe(catchError(handleMicroserviceException));
+  }
 }

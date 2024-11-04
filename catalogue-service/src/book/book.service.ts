@@ -86,6 +86,17 @@ export class BookService {
       include: [{ model: BookI18n }],
     });
 
+    if (!book) {
+      throw new RpcException('The book does not exist');
+    }
+
+    return book;
+  }
+
+  public async destroy(id: string) {
+    const book = await this.getOne(id);
+    book.destroy();
+
     return book;
   }
 }
