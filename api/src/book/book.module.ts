@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { BookController } from './book.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   controllers: [BookController],

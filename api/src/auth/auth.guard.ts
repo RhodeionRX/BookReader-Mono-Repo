@@ -1,27 +1,36 @@
 import {
+  CanActivate,
+  ExecutionContext,
   HttpException,
   HttpStatus,
   Injectable,
-  NestMiddleware,
 } from '@nestjs/common';
 import { verify } from 'jsonwebtoken';
+import { Observable } from 'rxjs';
+
 @Injectable()
-export class AuthMiddleware implements NestMiddleware {
-  use(req: any, res: any, next: () => void) {
-    if (!req.headers.authorization) {
+export class AuthGuard implements CanActivate {
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    const request = context.switchToHttp().getRequest();
+
+    if (!request.headers.authorization) {
       throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
     }
 
-    const token: string = req.headers.authorization
+    const token: string = request.headers.authorization
       .replace('Bearer', '')
       .trim();
 
     try {
       const decodedData = verify(token, process.env.SECRET);
-      req.user = decodedData;
-      next();
+
+      request.user = decodedData;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
     }
+
+    return true;
   }
 }

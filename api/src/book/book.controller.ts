@@ -21,6 +21,7 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { User } from 'src/user/user.decorator';
 import { IUser } from 'src/user/entities/user.entity';
 import { GetAllBooksRequest } from './models/requests/get-all-books.request';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('book')
 export class BookController {
@@ -33,6 +34,7 @@ export class BookController {
   // TODO: add cache
   @Version('1')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
   @Post('/init')
   public async init(
     @Body() initBookRequest: InitBookRequest,
