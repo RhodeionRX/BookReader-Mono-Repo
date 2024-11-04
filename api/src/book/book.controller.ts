@@ -22,6 +22,7 @@ import { User } from 'src/user/user.decorator';
 import { IUser } from 'src/user/entities/user.entity';
 import { GetAllBooksRequest } from './models/requests/get-all-books.request';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { handleMicroserviceException } from 'src/utils';
 
 @Controller('book')
 export class BookController {
@@ -30,7 +31,6 @@ export class BookController {
     private readonly catalogueServiceClient: ClientProxy,
   ) {}
 
-  // TODO: add guard
   // TODO: add cache
   @Version('1')
   @HttpCode(HttpStatus.OK)
@@ -42,20 +42,7 @@ export class BookController {
   ): Promise<Observable<any>> {
     return this.catalogueServiceClient
       .send('init', { ...initBookRequest, userId: user.id })
-      .pipe(
-        catchError((error) => {
-          return throwError(
-            () =>
-              new HttpException(
-                {
-                  status: HttpStatus.BAD_REQUEST,
-                  message: error.message || 'Unknown error',
-                },
-                HttpStatus.BAD_REQUEST,
-              ),
-          );
-        }),
-      );
+      .pipe(catchError(handleMicroserviceException));
   }
 
   @Version('1')
@@ -64,40 +51,18 @@ export class BookController {
   public async findAll(
     @Query() request: GetAllBooksRequest,
   ): Promise<Observable<any>> {
-    return this.catalogueServiceClient.send('getAll', request).pipe(
-      catchError((error) => {
-        return throwError(
-          () =>
-            new HttpException(
-              {
-                status: HttpStatus.BAD_REQUEST,
-                message: error.message || 'Unknown error',
-              },
-              HttpStatus.BAD_REQUEST,
-            ),
-        );
-      }),
-    );
+    return this.catalogueServiceClient
+      .send('getAll', request)
+      .pipe(catchError(handleMicroserviceException));
   }
 
   @Version('1')
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
   public async findOne(@Param('id') id: string) {
-    return this.catalogueServiceClient.send('getOne', id).pipe(
-      catchError((error) => {
-        return throwError(
-          () =>
-            new HttpException(
-              {
-                status: HttpStatus.BAD_REQUEST,
-                message: error.message || 'Unknown error',
-              },
-              HttpStatus.BAD_REQUEST,
-            ),
-        );
-      }),
-    );
+    return this.catalogueServiceClient
+      .send('getOne', id)
+      .pipe(catchError(handleMicroserviceException));
   }
 
   @Patch(':id')
