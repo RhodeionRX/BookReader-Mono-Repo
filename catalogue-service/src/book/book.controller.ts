@@ -3,6 +3,8 @@ import { BookService } from './book.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { InitBookDto } from './dto/init-book.dto';
 import { BookResponse } from './models/response/book.response';
+import { GetAllBooksDto } from './dto/get-all-book.dto';
+import { AllBooksResponse } from './models/response/all-book.response';
 
 @Controller('book')
 export class BookController {
@@ -12,5 +14,11 @@ export class BookController {
   public async init(initBookDto: InitBookDto): Promise<BookResponse> {
     const response = await this.service.create(initBookDto);
     return new BookResponse(response.book, response.translations);
+  }
+
+  @MessagePattern('getAll')
+  public async getAll(dto: GetAllBooksDto): Promise<AllBooksResponse> {
+    const response = await this.service.getAll(dto);
+    return new AllBooksResponse(response);
   }
 }

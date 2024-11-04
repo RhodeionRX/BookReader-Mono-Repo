@@ -13,7 +13,7 @@ export class BookI18nResponse {
     this.i18n = book_i18n.i18n;
     this.bookId = book_i18n.bookId;
     this.title = book_i18n.title;
-    this.description = book_i18n.description;
+    this.description = book_i18n.description ?? undefined;
     this.createdAt = book_i18n.createdAt;
     this.updatedAt = book_i18n.updatedAt;
   }

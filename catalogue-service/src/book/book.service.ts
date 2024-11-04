@@ -4,7 +4,9 @@ import { Book } from './book.model';
 import { InitBookDto } from './dto/init-book.dto';
 import { BookI18nService } from 'src/book_i18n/book_i18n.service';
 import { RpcException } from '@nestjs/microservices';
-
+import { GetAllBooksDto } from './dto/get-all-book.dto';
+import { Op } from 'sequelize';
+import { BookI18n } from 'src/book_i18n/book_i18n.model';
 @Injectable()
 export class BookService {
   constructor(
@@ -41,5 +43,41 @@ export class BookService {
     } catch (error) {
       throw new RpcException(error.message ?? 'Unknown exception');
     }
+  }
+
+  public async getAll(dto: GetAllBooksDto) {
+    const { creator_account_id, title, i18n, articul } = dto;
+
+    const whereScope: any = {};
+    const whereI18n: any = {};
+
+    if (creator_account_id) {
+      whereScope.creator_account_id = creator_account_id;
+    }
+
+    if (articul) {
+      whereScope.articul = {
+        [Op.eq]: articul,
+      };
+    }
+
+    if (title) {
+      whereI18n.title = {
+        [Op.iLike]: `%${title}%`,
+      };
+    }
+    if (i18n) {
+      whereI18n.i18n = i18n;
+    }
+
+    const books = await this.repository.findAll({
+      where: whereScope,
+      include: {
+        model: BookI18n,
+        where: whereI18n,
+      },
+    });
+
+    return books;
   }
 }

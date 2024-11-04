@@ -13,7 +13,7 @@ export class BookResponse {
   constructor(book: Book, translations?: BookI18n[]) {
     this.id = book.id;
     this.creatorAccountId = book.creator_account_id;
-    this.articul = book.articul;
+    this.articul = book.articul ?? undefined;
     this.createdAt = book.createdAt;
     this.updatedAt = book.updatedAt;
 
