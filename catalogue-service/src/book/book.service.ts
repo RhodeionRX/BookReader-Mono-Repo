@@ -83,10 +83,8 @@ export class BookService {
     return books;
   }
 
-  public async getOne(id: string, includeChildren: boolean = true) {
-    const options = includeChildren ? { include: [{ model: BookI18n }] } : {};
-
-    const book = await this.repository.findByPk(id, options);
+  public async getOne(id: string) {
+    const book = await this.repository.findByPk(id);
 
     if (!book) {
       throw new RpcException('The book does not exist');
@@ -96,7 +94,7 @@ export class BookService {
   }
 
   public async update(id: string, i18n: I18nEnum, dto: UpdateBookDto) {
-    const book = await this.getOne(id, false);
+    const book = await this.getOne(id);
 
     const { articul } = dto;
     book.update({ articul });

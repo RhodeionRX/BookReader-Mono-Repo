@@ -60,9 +60,9 @@ export class BookController {
   @Version('1')
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
-  public async findOne(@Param('id') id: string) {
+  public async findOne(@Param('id') id: string, @Query('lng') lng?: I18nEnum) {
     return this.catalogueServiceClient
-      .send('getOne', id)
+      .send('getOne', { id, i18n: lng ?? I18nEnum.ENGLISH })
       .pipe(catchError(handleMicroserviceException));
   }
 

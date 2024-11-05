@@ -15,6 +15,7 @@ export class BookI18nService {
   }
 
   public async getOne(bookId: string, i18n: I18nEnum) {
+    console.log(bookId, i18n);
     const bookI18n = await this.repository.findOne({
       where: {
         bookId,
