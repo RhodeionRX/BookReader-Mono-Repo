@@ -7,6 +7,8 @@ import { RpcException } from '@nestjs/microservices';
 import { GetAllBooksDto } from './dto/get-all-book.dto';
 import { Op } from 'sequelize';
 import { BookI18n } from 'src/book_i18n/book_i18n.model';
+import { UpdateBookDto } from './dto/update-book.dto';
+import { I18nEnum } from 'enums/i18n.enum';
 @Injectable()
 export class BookService {
   constructor(
@@ -81,16 +83,28 @@ export class BookService {
     return books;
   }
 
-  public async getOne(id: string) {
-    const book = await this.repository.findByPk(id, {
-      include: [{ model: BookI18n }],
-    });
+  public async getOne(id: string, includeChildren: boolean = true) {
+    const options = includeChildren ? { include: [{ model: BookI18n }] } : {};
+
+    const book = await this.repository.findByPk(id, options);
 
     if (!book) {
       throw new RpcException('The book does not exist');
     }
 
     return book;
+  }
+
+  public async update(id: string, i18n: I18nEnum, dto: UpdateBookDto) {
+    const book = await this.getOne(id, false);
+
+    const { articul } = dto;
+    book.update({ articul });
+    book.save();
+
+    const bookI18n = await this.bookI18nService.update(id, i18n, dto);
+
+    return { book, bookI18n };
   }
 
   public async destroy(id: string) {

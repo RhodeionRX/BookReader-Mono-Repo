@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateBookI18nDto } from './create-book_i18n.dto';
+import { OmitType } from '@nestjs/mapped-types';
+import { UpdateBookDto } from 'src/book/dto/update-book.dto';
 
-export class UpdateBookI18nDto extends PartialType(CreateBookI18nDto) {}
+export class UpdateBookI18nDto extends OmitType(UpdateBookDto, ['articul']) {}

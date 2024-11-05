@@ -5,6 +5,8 @@ import { InitBookDto } from './dto/init-book.dto';
 import { BookResponse } from './models/response/book.response';
 import { GetAllBooksDto } from './dto/get-all-book.dto';
 import { AllBooksResponse } from './models/response/all-book.response';
+import { UpdateBookDto } from './dto/update-book.dto';
+import { I18nEnum } from 'enums/i18n.enum';
 
 @Controller('book')
 export class BookController {
@@ -26,6 +28,21 @@ export class BookController {
   public async getOne(id: string): Promise<BookResponse> {
     const response = await this.service.getOne(id);
     return new BookResponse(response);
+  }
+
+  @MessagePattern('update')
+  public async update({
+    id,
+    i18n,
+    dto,
+  }: {
+    id: string;
+    i18n: I18nEnum;
+    dto: UpdateBookDto;
+  }): Promise<any> {
+    const updatedBook = await this.service.update(id, i18n, dto);
+    return new BookResponse(updatedBook.book, [updatedBook.bookI18n]);
+    return 'test';
   }
 
   @MessagePattern('destroy')

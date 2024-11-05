@@ -15,7 +15,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { InitBookRequest } from './models/requests/init-book.request';
-import { UpdateBookDto } from './models/update-book.dto';
+import { UpdateBookRequest } from './models/requests/update-book.request';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, Observable, throwError } from 'rxjs';
 import { User } from 'src/user/user.decorator';
@@ -23,6 +23,7 @@ import { IUser } from 'src/user/entities/user.entity';
 import { GetAllBooksRequest } from './models/requests/get-all-books.request';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { handleMicroserviceException } from 'src/utils';
+import { I18nEnum } from 'enums/I18n.enum';
 
 @Controller('book')
 export class BookController {
@@ -65,8 +66,28 @@ export class BookController {
       .pipe(catchError(handleMicroserviceException));
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {}
+  @Version('1')
+  @HttpCode(HttpStatus.OK)
+  @Patch(':id/:i18n')
+  public async update(
+    @Param('id') id: string,
+    @Param('i18n') i18n: I18nEnum,
+    @Body() updateBookDto: UpdateBookRequest,
+  ) {
+    if (!(i18n in I18nEnum)) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          message: `Invalid i18n value: ${i18n}. Must be one of: ${Object.values(I18nEnum).join(', ')}`,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return this.catalogueServiceClient
+      .send('update', { id, i18n, dto: updateBookDto })
+      .pipe(catchError(handleMicroserviceException));
+  }
 
   @Version('1')
   @HttpCode(HttpStatus.OK)
