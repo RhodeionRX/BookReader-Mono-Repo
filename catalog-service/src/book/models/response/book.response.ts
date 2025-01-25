@@ -20,7 +20,7 @@ export class BookResponse {
       this.title = translation[0].title;
       this.description = translation[0].description ?? undefined;
       this.i18n = translation[0].i18n;
-    } else {
+    } else if (translation) {
       this.title = translation.title;
       this.description = translation.description ?? undefined;
       this.i18n = translation.i18n;

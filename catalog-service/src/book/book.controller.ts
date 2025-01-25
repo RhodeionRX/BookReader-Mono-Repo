@@ -25,6 +25,7 @@ export class BookController {
   @MessagePattern('getAll')
   public async getAll(dto: GetAllBooksDto): Promise<AllBooksResponse> {
     const response = await this.service.getAll(dto);
+
     return new AllBooksResponse(response);
   }
 
