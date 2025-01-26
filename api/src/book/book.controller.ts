@@ -14,16 +14,19 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { InitBookRequest } from './models/requests/init-book.request';
-import { UpdateBookRequest } from './models/requests/update-book.request';
 import { ClientProxy } from '@nestjs/microservices';
 import { catchError, Observable, throwError } from 'rxjs';
 import { User } from 'src/user/user.decorator';
 import { IUser } from 'src/user/entities/user.entity';
-import { GetAllBooksRequest } from './models/requests/get-all-books.request';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { handleMicroserviceException } from 'src/utils';
 import { I18nEnum } from 'enums/I18n.enum';
+import {
+  AddI18nRequest,
+  GetAllBooksRequest,
+  InitBookRequest,
+  UpdateBookRequest,
+} from './models/requests';
 
 @Controller('book')
 export class BookController {
@@ -38,11 +41,11 @@ export class BookController {
   @UseGuards(AuthGuard)
   @Post('/init')
   public async init(
-    @Body() initBookRequest: InitBookRequest,
+    @Body() dto: InitBookRequest,
     @User() user: IUser,
   ): Promise<Observable<any>> {
     return this.catalogueServiceClient
-      .send('init', { ...initBookRequest, userId: user.id })
+      .send('init', { ...dto, userId: user.id })
       .pipe(catchError(handleMicroserviceException));
   }
 
@@ -50,29 +53,33 @@ export class BookController {
   @HttpCode(HttpStatus.OK)
   @Get()
   public async findAll(
-    @Query() request: GetAllBooksRequest,
+    @Query() query: GetAllBooksRequest,
   ): Promise<Observable<any>> {
     return this.catalogueServiceClient
-      .send('getAll', request)
+      .send('getAll', query)
       .pipe(catchError(handleMicroserviceException));
   }
 
   @Version('1')
   @HttpCode(HttpStatus.OK)
   @Get('/:id')
-  public async findOne(@Param('id') id: string, @Query('lng') lng?: I18nEnum) {
+  public async findOne(
+    @Param('id') id: string,
+    @Query('lng') lng: I18nEnum = I18nEnum.ENGLISH,
+  ) {
     return this.catalogueServiceClient
-      .send('getOne', { id, i18n: lng ?? I18nEnum.ENGLISH })
+      .send('getOne', { id, i18n: lng })
       .pipe(catchError(handleMicroserviceException));
   }
 
   @Version('1')
   @HttpCode(HttpStatus.OK)
-  @Patch(':id/:i18n')
+  @Patch('/:id/:i18n')
+  @UseGuards(AuthGuard)
   public async update(
     @Param('id') id: string,
     @Param('i18n') i18n: I18nEnum,
-    @Body() updateBookDto: UpdateBookRequest,
+    @Body() dto: UpdateBookRequest,
   ) {
     if (!(i18n in I18nEnum)) {
       throw new HttpException(
@@ -85,13 +92,26 @@ export class BookController {
     }
 
     return this.catalogueServiceClient
-      .send('update', { id, i18n, dto: updateBookDto })
+      .send('update', { id, i18n, dto })
       .pipe(catchError(handleMicroserviceException));
   }
 
   @Version('1')
+  @HttpCode(HttpStatus.CREATED)
+  @Post('/:id')
+  @UseGuards(AuthGuard)
+  public async addI18n(@Param('id') id: string, @Body() dto: AddI18nRequest) {
+    const result = await this.catalogueServiceClient
+      .send('addI18n', { id, dto })
+      .pipe(catchError(handleMicroserviceException));
+
+    return result;
+  }
+
+  @Version('1')
   @HttpCode(HttpStatus.OK)
-  @Delete(':id')
+  @Delete('/:id')
+  @UseGuards(AuthGuard)
   public async remove(@Param('id') id: string) {
     return this.catalogueServiceClient
       .send('destroy', id)

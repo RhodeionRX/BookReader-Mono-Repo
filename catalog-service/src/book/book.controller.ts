@@ -39,7 +39,7 @@ export class BookController {
   }): Promise<BookResponse> {
     const book = await this.service.getOne(id);
     const bookI18n = await this.serviceI18n.getOne(id, i18n);
-    return new BookResponse(book, [bookI18n]);
+    return new BookResponse(book, bookI18n);
   }
 
   @MessagePattern('update')
@@ -51,14 +51,21 @@ export class BookController {
     id: string;
     i18n: I18nEnum;
     dto: UpdateBookDto;
-  }): Promise<any> {
-    const updatedBook = await this.service.update(id, i18n, dto);
-    return new BookResponse(updatedBook.book, updatedBook.bookI18n);
+  }): Promise<BookResponse> {
+    const response = await this.service.update(id, i18n, dto);
+    return new BookResponse(response.book, response.bookI18n);
   }
 
   @MessagePattern('destroy')
   public async destroy(id: string): Promise<BookResponse> {
     const response = await this.service.destroy(id);
     return new BookResponse(response);
+  }
+
+  @MessagePattern('addI18n')
+  public async addI18n({ id, dto }: any) {
+    const response = await this.service.addI18n(id, dto);
+
+    return response;
   }
 }

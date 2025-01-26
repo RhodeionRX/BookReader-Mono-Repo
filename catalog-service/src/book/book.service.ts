@@ -105,6 +105,24 @@ export class BookService {
     return { book, bookI18n };
   }
 
+  public async addI18n(id: string, dto: any) {
+    const book = await this.getOne(id);
+
+    if (!book) {
+      throw new RpcException('This book does not exist');
+    }
+
+    const bookI18nCandidate = await this.bookI18nService.getOne(id, dto.i18n);
+
+    if (bookI18nCandidate) {
+      throw new RpcException('This localization already added');
+    }
+
+    const bookI18n = await this.bookI18nService.create({ bookId: id, ...dto });
+
+    return { book, i18n: bookI18n };
+  }
+
   public async destroy(id: string) {
     const book = await this.getOne(id);
     book.destroy();

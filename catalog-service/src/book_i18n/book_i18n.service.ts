@@ -15,7 +15,6 @@ export class BookI18nService {
   }
 
   public async getOne(bookId: string, i18n: I18nEnum) {
-    console.log(bookId, i18n);
     const bookI18n = await this.repository.findOne({
       where: {
         bookId,
@@ -37,9 +36,5 @@ export class BookI18nService {
     bookI18n.save();
 
     return bookI18n;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} bookI18n`;
   }
 }
