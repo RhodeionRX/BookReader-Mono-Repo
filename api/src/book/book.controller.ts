@@ -15,7 +15,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, lastValueFrom, Observable, throwError } from 'rxjs';
 import { User } from 'src/user/user.decorator';
 import { IUser } from 'src/user/entities/user.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -26,7 +26,9 @@ import {
   GetAllBooksRequest,
   InitBookRequest,
   UpdateBookRequest,
-} from './models/requests';
+} from './models/request';
+import { AllBooksResponse, BookResponse } from './models/response';
+import { Book, BookTranslation } from './models/entity';
 
 @Controller('book')
 export class BookController {
@@ -43,10 +45,19 @@ export class BookController {
   public async init(
     @Body() dto: InitBookRequest,
     @User() user: IUser,
-  ): Promise<Observable<any>> {
-    return this.catalogueServiceClient
-      .send('init', { ...dto, userId: user.id })
-      .pipe(catchError(handleMicroserviceException));
+  ): Promise<BookResponse> {
+    const result: unknown = await lastValueFrom(
+      this.catalogueServiceClient
+        .send('init', { ...dto, userId: user.id })
+        .pipe(catchError(handleMicroserviceException)),
+    );
+
+    const { book, translations } = result as {
+      book: Book;
+      translations: BookTranslation | BookTranslation[];
+    };
+
+    return new BookResponse(book, translations);
   }
 
   @Version('1')
@@ -54,10 +65,16 @@ export class BookController {
   @Get()
   public async findAll(
     @Query() query: GetAllBooksRequest,
-  ): Promise<Observable<any>> {
-    return this.catalogueServiceClient
-      .send('getAll', query)
-      .pipe(catchError(handleMicroserviceException));
+  ): Promise<AllBooksResponse> {
+    const result: unknown = await lastValueFrom(
+      this.catalogueServiceClient
+        .send('getAll', query)
+        .pipe(catchError(handleMicroserviceException)),
+    );
+
+    const { books } = result as { books: Book[] };
+
+    return new AllBooksResponse(books);
   }
 
   @Version('1')
@@ -66,10 +83,19 @@ export class BookController {
   public async findOne(
     @Param('id') id: string,
     @Query('lng') lng: I18nEnum = I18nEnum.ENGLISH,
-  ) {
-    return this.catalogueServiceClient
-      .send('getOne', { id, i18n: lng })
-      .pipe(catchError(handleMicroserviceException));
+  ): Promise<BookResponse> {
+    const result: unknown = await lastValueFrom(
+      this.catalogueServiceClient
+        .send('getOne', { id, i18n: lng })
+        .pipe(catchError(handleMicroserviceException)),
+    );
+
+    const { book, translation } = result as {
+      book: Book;
+      translation: BookTranslation;
+    };
+
+    return new BookResponse(book, translation);
   }
 
   @Version('1')
@@ -80,7 +106,7 @@ export class BookController {
     @Param('id') id: string,
     @Param('i18n') i18n: I18nEnum,
     @Body() dto: UpdateBookRequest,
-  ) {
+  ): Promise<BookResponse> {
     if (!(i18n in I18nEnum)) {
       throw new HttpException(
         {
@@ -91,21 +117,40 @@ export class BookController {
       );
     }
 
-    return this.catalogueServiceClient
-      .send('update', { id, i18n, dto })
-      .pipe(catchError(handleMicroserviceException));
+    const result: unknown = await lastValueFrom(
+      this.catalogueServiceClient
+        .send('update', { id, i18n, dto })
+        .pipe(catchError(handleMicroserviceException)),
+    );
+
+    const { book, translation } = result as {
+      book: Book;
+      translation: BookTranslation;
+    };
+
+    return new BookResponse(book, translation);
   }
 
   @Version('1')
   @HttpCode(HttpStatus.CREATED)
   @Post('/:id')
   @UseGuards(AuthGuard)
-  public async addI18n(@Param('id') id: string, @Body() dto: AddI18nRequest) {
-    const result = await this.catalogueServiceClient
-      .send('addI18n', { id, dto })
-      .pipe(catchError(handleMicroserviceException));
+  public async addI18n(
+    @Param('id') id: string,
+    @Body() dto: AddI18nRequest,
+  ): Promise<BookResponse> {
+    const result: unknown = await lastValueFrom(
+      this.catalogueServiceClient
+        .send('addI18n', { id, dto })
+        .pipe(catchError(handleMicroserviceException)),
+    );
 
-    return result;
+    const { book, translation } = result as {
+      book: Book;
+      translation: BookTranslation;
+    };
+
+    return new BookResponse(book, translation);
   }
 
   @Version('1')
@@ -113,8 +158,16 @@ export class BookController {
   @Delete('/:id')
   @UseGuards(AuthGuard)
   public async remove(@Param('id') id: string) {
-    return this.catalogueServiceClient
-      .send('destroy', id)
-      .pipe(catchError(handleMicroserviceException));
+    const result = await lastValueFrom(
+      this.catalogueServiceClient
+        .send('destroy', id)
+        .pipe(catchError(handleMicroserviceException)),
+    );
+
+    const { book } = result as {
+      book: Book;
+    };
+
+    return new BookResponse(book);
   }
 }

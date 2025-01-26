@@ -9,6 +9,7 @@ import { Op } from 'sequelize';
 import { BookI18n } from 'src/book_i18n/book_i18n.model';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { I18nEnum } from 'enums/i18n.enum';
+import { AddI18nDto } from './dto/add-i18n.dto';
 @Injectable()
 export class BookService {
   constructor(
@@ -105,7 +106,7 @@ export class BookService {
     return { book, bookI18n };
   }
 
-  public async addI18n(id: string, dto: any) {
+  public async addI18n(id: string, dto: AddI18nDto) {
     const book = await this.getOne(id);
 
     if (!book) {
@@ -118,9 +119,12 @@ export class BookService {
       throw new RpcException('This localization already added');
     }
 
-    const bookI18n = await this.bookI18nService.create({ bookId: id, ...dto });
+    const translation = await this.bookI18nService.create({
+      bookId: id,
+      ...dto,
+    });
 
-    return { book, i18n: bookI18n };
+    return { book, translation };
   }
 
   public async destroy(id: string) {

@@ -2,12 +2,11 @@ import { Controller } from '@nestjs/common';
 import { BookService } from './book.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { InitBookDto } from './dto/init-book.dto';
-import { BookResponse } from './models/response/book.response';
 import { GetAllBooksDto } from './dto/get-all-book.dto';
-import { AllBooksResponse } from './models/response/all-book.response';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { I18nEnum } from 'enums/i18n.enum';
 import { BookI18nService } from 'src/book_i18n/book_i18n.service';
+import { AddI18nDto } from './dto/add-i18n.dto';
 
 @Controller('book')
 export class BookController {
@@ -17,16 +16,16 @@ export class BookController {
   ) {}
 
   @MessagePattern('init')
-  public async init(initBookDto: InitBookDto): Promise<BookResponse> {
+  public async init(initBookDto: InitBookDto) {
     const response = await this.service.create(initBookDto);
-    return new BookResponse(response.book, response.translations);
+    return { book: response.book, translations: response.translations };
   }
 
   @MessagePattern('getAll')
-  public async getAll(dto: GetAllBooksDto): Promise<AllBooksResponse> {
+  public async getAll(dto: GetAllBooksDto) {
     const response = await this.service.getAll(dto);
 
-    return new AllBooksResponse(response);
+    return { books: response };
   }
 
   @MessagePattern('getOne')
@@ -36,10 +35,10 @@ export class BookController {
   }: {
     id: string;
     i18n: I18nEnum;
-  }): Promise<BookResponse> {
-    const book = await this.service.getOne(id);
-    const bookI18n = await this.serviceI18n.getOne(id, i18n);
-    return new BookResponse(book, bookI18n);
+  }) {
+    const bookResponse = await this.service.getOne(id);
+    const bookI18nResponse = await this.serviceI18n.getOne(id, i18n);
+    return { book: bookResponse, translation: bookI18nResponse };
   }
 
   @MessagePattern('update')
@@ -51,19 +50,19 @@ export class BookController {
     id: string;
     i18n: I18nEnum;
     dto: UpdateBookDto;
-  }): Promise<BookResponse> {
+  }) {
     const response = await this.service.update(id, i18n, dto);
-    return new BookResponse(response.book, response.bookI18n);
+    return { book: response.book, translation: response.bookI18n };
   }
 
   @MessagePattern('destroy')
-  public async destroy(id: string): Promise<BookResponse> {
+  public async destroy(id: string) {
     const response = await this.service.destroy(id);
-    return new BookResponse(response);
+    return { book: response };
   }
 
   @MessagePattern('addI18n')
-  public async addI18n({ id, dto }: any) {
+  public async addI18n({ id, dto }: { id: string; dto: AddI18nDto }) {
     const response = await this.service.addI18n(id, dto);
 
     return response;
