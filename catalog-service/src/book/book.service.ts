@@ -74,10 +74,18 @@ export class BookService {
   public async update(id: string, i18n: I18nEnum, dto: UpdateBookDto) {
     const { articul } = dto;
 
-    const book = this.repository.update(id, { articul });
-    const bookI18n = await this.bookI18nService.update(id, i18n, dto);
+    const book = await this.repository.update(id, { articul });
+    const translations = await this.bookI18nService.update(id, i18n, dto);
 
-    return { book, bookI18n };
+    // TODO get rid of JSON.stringify
+    const cleanBook = JSON.parse(JSON.stringify(book));
+
+    const result = {
+      ...cleanBook,
+      translations,
+    };
+
+    return result;
   }
 
   public async addI18n(id: string, dto: AddI18nDto) {
@@ -94,7 +102,15 @@ export class BookService {
       ...dto,
     });
 
-    return { book, translations };
+    // TODO get rid of JSON.stringify
+    const cleanBook = JSON.parse(JSON.stringify(book));
+
+    const result = {
+      ...cleanBook,
+      translations,
+    };
+
+    return result;
   }
 
   public async destroy(id: string) {
