@@ -5,6 +5,7 @@ import { CreationAttributes } from 'sequelize/types/model';
 import { RpcException } from '@nestjs/microservices';
 import { I18nEnum } from 'enums/i18n.enum';
 import { BookI18n } from 'src/book_i18n/book_i18n.model';
+import { Op } from 'sequelize';
 
 interface IFindBookParams {
   id?: string;
@@ -115,6 +116,30 @@ export class BookRepository {
     }
 
     return book;
+  }
+
+  public async find(params: any) {
+    const { creator_account_id, title, i18n, articul } = params;
+
+    const whereClause = {
+      ...(creator_account_id && { creator_account_id }),
+      ...(articul && { [Op.eq]: articul }),
+    };
+
+    const i18nWhereClause = {
+      ...(title && { [Op.iLike]: `%${title}%` }),
+      ...(i18n && { i18n }),
+    };
+
+    const bookList = await this.model.findAll({
+      where: whereClause,
+      include: {
+        model: BookI18n,
+        where: i18nWhereClause,
+      },
+    });
+
+    return bookList;
   }
 
   /** Update a book.
