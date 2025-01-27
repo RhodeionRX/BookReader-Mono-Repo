@@ -90,12 +90,11 @@ export class BookController {
         .pipe(catchError(handleMicroserviceException)),
     );
 
-    const { book, translation } = result as {
+    const { book } = result as {
       book: Book;
-      translation: BookTranslation;
     };
 
-    return new BookResponse(book, translation);
+    return new BookResponse(book, book.translations);
   }
 
   @Version('1')

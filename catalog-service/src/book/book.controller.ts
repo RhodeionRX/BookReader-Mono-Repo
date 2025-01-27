@@ -36,9 +36,8 @@ export class BookController {
     id: string;
     i18n: I18nEnum;
   }) {
-    const bookResponse = await this.service.getOne(id);
-    const bookI18nResponse = await this.serviceI18n.getOne(id, i18n);
-    return { book: bookResponse, translation: bookI18nResponse };
+    const book = await this.service.getOne(id, i18n);
+    return { book };
   }
 
   @MessagePattern('update')

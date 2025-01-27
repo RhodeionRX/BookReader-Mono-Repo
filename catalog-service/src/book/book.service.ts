@@ -10,10 +10,12 @@ import { BookI18n } from 'src/book_i18n/book_i18n.model';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { I18nEnum } from 'enums/i18n.enum';
 import { AddI18nDto } from './dto/add-i18n.dto';
+import { BookRepository } from './book.repository';
 @Injectable()
 export class BookService {
   constructor(
-    @InjectModel(Book) private repository: typeof Book,
+    @InjectModel(Book) private repositoryOld: typeof Book,
+    private repository: BookRepository,
     private bookI18nService: BookI18nService,
   ) {}
 
@@ -73,7 +75,7 @@ export class BookService {
       whereI18n.i18n = i18n;
     }
 
-    const books = await this.repository.findAll({
+    const books = await this.repositoryOld.findAll({
       where: whereScope,
       include: {
         model: BookI18n,
@@ -84,34 +86,23 @@ export class BookService {
     return books;
   }
 
-  public async getOne(id: string) {
-    const book = await this.repository.findByPk(id);
-
-    if (!book) {
-      throw new RpcException('The book does not exist');
-    }
+  public async getOne(id: string, i18n: I18nEnum = I18nEnum.ENGLISH) {
+    const book = await this.repository.findOneOrFail({ id });
 
     return book;
   }
 
   public async update(id: string, i18n: I18nEnum, dto: UpdateBookDto) {
-    const book = await this.getOne(id);
-
     const { articul } = dto;
-    book.update({ articul });
-    book.save();
 
+    const book = this.repository.update(id, { articul });
     const bookI18n = await this.bookI18nService.update(id, i18n, dto);
 
     return { book, bookI18n };
   }
 
   public async addI18n(id: string, dto: AddI18nDto) {
-    const book = await this.getOne(id);
-
-    if (!book) {
-      throw new RpcException('This book does not exist');
-    }
+    const book = await this.repository.findOneOrFail({ id });
 
     const bookI18nCandidate = await this.bookI18nService.getOne(id, dto.i18n);
 
@@ -128,9 +119,7 @@ export class BookService {
   }
 
   public async destroy(id: string) {
-    const book = await this.getOne(id);
-    book.destroy();
-
+    const book = await this.repository.delete(id);
     return book;
   }
 }
