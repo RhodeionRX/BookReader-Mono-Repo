@@ -29,6 +29,7 @@ import {
 } from './models/request';
 import { AllBooksResponse, BookResponse } from './models/response';
 import { Book, BookTranslation } from './models/entity';
+import { GetAllBooksResponse } from './models/interfaces';
 
 @Controller('book')
 export class BookController {
@@ -52,12 +53,9 @@ export class BookController {
         .pipe(catchError(handleMicroserviceException)),
     );
 
-    const { book, translations } = result as {
-      book: Book;
-      translations: BookTranslation | BookTranslation[];
-    };
+    const book = result as Book;
 
-    return new BookResponse(book, translations);
+    return new BookResponse(book, book.translations);
   }
 
   @Version('1')
@@ -65,16 +63,16 @@ export class BookController {
   @Get()
   public async findAll(
     @Query() query: GetAllBooksRequest,
-  ): Promise<AllBooksResponse> {
+  ): Promise<AllBooksResponse | any> {
     const result: unknown = await lastValueFrom(
       this.catalogueServiceClient
         .send('getAll', query)
         .pipe(catchError(handleMicroserviceException)),
     );
 
-    const { books } = result as { books: Book[] };
+    const books = result as GetAllBooksResponse;
 
-    return new AllBooksResponse(books);
+    return new AllBooksResponse(books, query.page, query.size);
   }
 
   @Version('1')
@@ -90,9 +88,7 @@ export class BookController {
         .pipe(catchError(handleMicroserviceException)),
     );
 
-    const { book } = result as {
-      book: Book;
-    };
+    const book = result as Book;
 
     return new BookResponse(book, book.translations);
   }
@@ -122,12 +118,9 @@ export class BookController {
         .pipe(catchError(handleMicroserviceException)),
     );
 
-    const { book, translation } = result as {
-      book: Book;
-      translation: BookTranslation;
-    };
+    const book = result as Book;
 
-    return new BookResponse(book, translation);
+    return new BookResponse(book, book.translations);
   }
 
   @Version('1')
@@ -144,12 +137,9 @@ export class BookController {
         .pipe(catchError(handleMicroserviceException)),
     );
 
-    const { book, translation } = result as {
-      book: Book;
-      translation: BookTranslation;
-    };
+    const book = result as Book;
 
-    return new BookResponse(book, translation);
+    return new BookResponse(book, book.translations);
   }
 
   @Version('1')
@@ -163,9 +153,7 @@ export class BookController {
         .pipe(catchError(handleMicroserviceException)),
     );
 
-    const { book } = result as {
-      book: Book;
-    };
+    const book = result as Book;
 
     return new BookResponse(book);
   }

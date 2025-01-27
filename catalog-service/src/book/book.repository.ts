@@ -6,14 +6,11 @@ import { RpcException } from '@nestjs/microservices';
 import { I18nEnum } from 'enums/i18n.enum';
 import { BookI18n } from 'src/book_i18n/book_i18n.model';
 import { Op } from 'sequelize';
-
-interface IFindBookParams {
-  id?: string;
-  creator_account_id?: string;
-  articul?: string;
-  createdAt?: Date;
-  i18n?: I18nEnum;
-}
+import {
+  IFindBooksParams,
+  IFindBooksResponse,
+  IFindOneBookParams,
+} from './interfaces';
 
 @Injectable()
 export class BookRepository {
@@ -50,7 +47,7 @@ export class BookRepository {
    * 
    */
 
-  public async findOne(data: IFindBookParams): Promise<Book | null> {
+  public async findOne(data: IFindOneBookParams): Promise<Book | null> {
     const {
       id,
       creator_account_id,
@@ -108,7 +105,7 @@ export class BookRepository {
    * @throws {Error} If the query fails or the parameters are invalid
    */
 
-  public async findOneOrFail(data: IFindBookParams): Promise<Book> {
+  public async findOneOrFail(data: IFindOneBookParams): Promise<Book> {
     const book = this.findOne(data);
 
     if (!book) {
@@ -118,8 +115,40 @@ export class BookRepository {
     return book;
   }
 
-  public async find(params: any) {
-    const { creator_account_id, title, i18n, articul } = params;
+  /** Find and filter books by specified parameters.
+   *
+   * Searches for book entries in the database using the provided criteria.
+
+   * @param {Object} params - Parameters to search for a book.
+   * @param {string} [params.creator_account_id] - The ID of the account that created the book.
+   * @param {string} [params.title] - The book's title.
+   * @param {I18nEnum} [params.i18n] - The book localization, searches for books having specified localization.
+   * @param {string} [params.articul] - The unique article identifier of the book.
+   * @param {int} [params.size] - The size of the pool.
+   * @param {int} [params.page] - The page.
+   *
+   *
+   * @returns {Promise<IFindBooksResponse>} - Returns the found books, total amount, amount of page and current page number.
+   * @example
+   * // Find books by a title
+   * const books = await find({ title: 'test' });
+   * 
+   * @example
+   * // Find books by creator's account ID and article
+   * const books = await find({ creator_account_id: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
+   * 
+   * @throws {Error} If the query fails or the parameters are invalid
+   */
+
+  public async find(params: IFindBooksParams): Promise<IFindBooksResponse> {
+    const {
+      creator_account_id,
+      title,
+      i18n,
+      articul,
+      size = 10,
+      page = 1,
+    } = params;
 
     const whereClause = {
       ...(creator_account_id && { creator_account_id }),
@@ -127,16 +156,20 @@ export class BookRepository {
     };
 
     const i18nWhereClause = {
-      ...(title && { [Op.iLike]: `%${title}%` }),
+      ...(title && { title: { [Op.iLike]: `%${title}%` } }),
       ...(i18n && { i18n }),
     };
 
-    const bookList = await this.model.findAll({
+    const offset = page * size - size;
+
+    const bookList = await this.model.findAndCountAll({
       where: whereClause,
       include: {
         model: BookI18n,
         where: i18nWhereClause,
       },
+      limit: size,
+      offset,
     });
 
     return bookList;

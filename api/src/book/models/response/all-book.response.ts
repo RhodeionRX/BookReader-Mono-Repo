@@ -1,12 +1,20 @@
-import { Book } from '../entity/book.entity';
+import { GetAllBooksResponse } from '../interfaces';
 import { BookResponse } from './book.response';
 
 export class AllBooksResponse {
   books: BookResponse[];
   total: number;
+  page: number;
+  pageTotal: number;
 
-  constructor(books: Book[]) {
-    this.books = books.map((book) => new BookResponse(book, book.translations));
-    this.total = books.length;
+  constructor(
+    { rows, count }: GetAllBooksResponse,
+    page: number,
+    size: number,
+  ) {
+    this.books = rows.map((book) => new BookResponse(book, book.translations));
+    this.total = count;
+    this.page = page;
+    this.pageTotal = Math.ceil(count / size);
   }
 }

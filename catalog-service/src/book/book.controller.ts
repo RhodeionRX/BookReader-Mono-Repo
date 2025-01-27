@@ -10,22 +10,19 @@ import { AddI18nDto } from './dto/add-i18n.dto';
 
 @Controller('book')
 export class BookController {
-  constructor(
-    private service: BookService,
-    private serviceI18n: BookI18nService,
-  ) {}
+  constructor(private service: BookService) {}
 
   @MessagePattern('init')
   public async init(initBookDto: InitBookDto) {
-    const response = await this.service.create(initBookDto);
-    return { book: response.book, translations: response.translations };
+    const book = await this.service.create(initBookDto);
+    return book;
   }
 
   @MessagePattern('getAll')
   public async getAll(dto: GetAllBooksDto) {
     const response = await this.service.getAll(dto);
 
-    return { books: response };
+    return response;
   }
 
   @MessagePattern('getOne')
@@ -36,8 +33,8 @@ export class BookController {
     id: string;
     i18n: I18nEnum;
   }) {
-    const book = await this.service.getOne(id, i18n);
-    return { book };
+    const response = await this.service.getOne(id, i18n);
+    return response;
   }
 
   @MessagePattern('update')
@@ -51,13 +48,13 @@ export class BookController {
     dto: UpdateBookDto;
   }) {
     const response = await this.service.update(id, i18n, dto);
-    return { book: response.book, translation: response.bookI18n };
+    return response;
   }
 
   @MessagePattern('destroy')
   public async destroy(id: string) {
     const response = await this.service.destroy(id);
-    return { book: response };
+    return response;
   }
 
   @MessagePattern('addI18n')

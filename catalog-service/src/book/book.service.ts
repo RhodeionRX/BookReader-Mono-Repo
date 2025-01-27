@@ -51,36 +51,15 @@ export class BookService {
   }
 
   public async getAll(dto: GetAllBooksDto) {
-    const { creator_account_id, title, i18n, articul } = dto;
+    const { creator_account_id, title, i18n, articul, size, page } = dto;
 
-    const whereScope: any = {};
-    const whereI18n: any = {};
-
-    if (creator_account_id) {
-      whereScope.creator_account_id = creator_account_id;
-    }
-
-    if (articul) {
-      whereScope.articul = {
-        [Op.eq]: articul,
-      };
-    }
-
-    if (title) {
-      whereI18n.title = {
-        [Op.iLike]: `%${title}%`,
-      };
-    }
-    if (i18n) {
-      whereI18n.i18n = i18n;
-    }
-
-    const books = await this.repositoryOld.findAll({
-      where: whereScope,
-      include: {
-        model: BookI18n,
-        where: whereI18n,
-      },
+    const books = await this.repository.find({
+      creator_account_id,
+      title,
+      i18n,
+      articul,
+      size,
+      page,
     });
 
     return books;
@@ -110,12 +89,12 @@ export class BookService {
       throw new RpcException('This localization already added');
     }
 
-    const translation = await this.bookI18nService.create({
+    const translations = await this.bookI18nService.create({
       bookId: id,
       ...dto,
     });
 
-    return { book, translation };
+    return { book, translations };
   }
 
   public async destroy(id: string) {
