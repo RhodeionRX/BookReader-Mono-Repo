@@ -62,13 +62,7 @@ export class BookRepository {
    */
 
   public async findOne(data: IFindOneBookParams): Promise<Book | null> {
-    const {
-      id,
-      creator_account_id,
-      createdAt,
-      articul,
-      i18n = I18nEnum.ENGLISH,
-    } = data;
+    const { id, creator_account_id, createdAt, articul } = data;
 
     const whereClause = {
       ...(id && { id }),
@@ -77,17 +71,12 @@ export class BookRepository {
       ...(createdAt && { createdAt }),
     };
 
-    const includeWhereClause = {
-      ...(i18n && { i18n }),
-    };
-
     const book = this.model.findOne({
       where: whereClause,
       include: [
         {
           model: BookI18n,
           as: 'translations',
-          where: includeWhereClause,
         },
       ],
     });

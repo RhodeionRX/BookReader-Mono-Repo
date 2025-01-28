@@ -66,27 +66,12 @@ export class BookService {
     const booksWithAppliedI18n = [];
 
     books.rows.forEach((book) => {
-      let translation = {};
-
-      // Search the translation matching requested localization
-      translation = book.translations.find(
-        (translation) => translation.i18n === localization,
+      const bookWithSpecifiedI18n = this.retrieveSingleTranslation(
+        book,
+        localization,
       );
 
-      // If not translation found attempt to search one with english localization
-      if (!translation) {
-        translation = book.translations.find(
-          (translation) => translation.i18n === I18nEnum.ENGLISH,
-        );
-      }
-
-      // If even english localization fails then apply the first translation in the list or null
-      if (!translation) {
-        translation = book.translations[0] ?? null;
-      }
-
-      const cleanBook = book.toJSON();
-      booksWithAppliedI18n.push({ ...cleanBook, translations: translation });
+      booksWithAppliedI18n.push(bookWithSpecifiedI18n);
     });
 
     return {
@@ -98,7 +83,9 @@ export class BookService {
   public async getOne(id: string, i18n: I18nEnum = I18nEnum.ENGLISH) {
     const book = await this.repository.findOneOrFail({ id });
 
-    return book;
+    const bookWithSpecifiedI18n = this.retrieveSingleTranslation(book, i18n);
+
+    return bookWithSpecifiedI18n;
   }
 
   public async update(id: string, i18n: I18nEnum, dto: UpdateBookDto) {
@@ -146,5 +133,28 @@ export class BookService {
   public async destroy(id: string) {
     const book = await this.repository.delete(id);
     return book;
+  }
+
+  private retrieveSingleTranslation(book: Book, i18n: I18nEnum) {
+    let translation = {};
+
+    // Search the translation matching requested localization
+    translation = book.translations.find(
+      (translation) => translation.i18n === i18n,
+    );
+
+    // If not translation found attempt to search one with english localization
+    if (!translation) {
+      translation = book.translations.find(
+        (translation) => translation.i18n === I18nEnum.ENGLISH,
+      );
+    }
+
+    // If even english localization fails then apply the first translation in the list or null
+    if (!translation) {
+      translation = book.translations[0] ?? null;
+    }
+
+    return { ...book.toJSON(), translations: translation };
   }
 }
