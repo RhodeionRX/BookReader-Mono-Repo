@@ -16,8 +16,23 @@ import {
 export class BookRepository {
   constructor(@InjectModel(Book) private model: typeof Book) {}
 
-  // TODO add JS Doc
-  public async create(data: CreationAttributes<Book>) {
+  /** Create a book by specified parameters.
+   *
+   * Creates a new book entity in the database.
+   *
+   * @param {Object} data - Parameters to search for a book.
+   * @param {string} [data.creator_account_id] - The ID of the account that created the book.
+   * @param {string} [data.articul] - The unique article identifier of the book.
+   *
+   * @returns {Promise<Book|null>} - Returns the found book object if exists, otherwise `null`.
+   * @example
+   * // Create a new book
+   * const book = await create({
+   *   articul: 'BOOK-002',
+   *   creator_account_id: '123e4567-e89b-12d3-a456-426614174000',
+   * });
+   */
+  public async create(data: CreationAttributes<Book>): Promise<Book | null> {
     const book = await this.model.create(data);
 
     return book;
@@ -27,7 +42,6 @@ export class BookRepository {
    *
    *
    * Searches for a single book entry in the database using the provided criteria.
-
    * @param {Object} data - Parameters to search for a book.
    * @param {string} [data.id] - The unique identifier of the book.
    * @param {string} [data.creator_account_id] - The ID of the account that created the book.
@@ -40,11 +54,11 @@ export class BookRepository {
    * @example
    * // Find a book by its ID
    * const book = await findOne({ id: '123e4567-e89b-12d3-a456-426614174000' });
-   * 
+   *
    * @example
    * // Find a book by creator's account ID and article
    * const book = await findOne({ creator_account_id: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
-   * 
+   *
    */
 
   public async findOne(data: IFindOneBookParams): Promise<Book | null> {
@@ -83,25 +97,22 @@ export class BookRepository {
 
   /** Find one book by specified parameters.
    *
-   *
    * Searches for a single book entry in the database using the provided criteria.
-
    * @param {Object} data - Parameters to search for a book.
    * @param {string} [data.id] - The unique identifier of the book.
    * @param {string} [data.creator_account_id] - The ID of the account that created the book.
    * @param {Date} [data.createdAt] - The timestamp when the book was created.
    * @param {string} [data.articul] - The unique article identifier of the book.
    *
-   *
    * @returns {Promise<Book|null>} - Returns the found book object if exists.
    * @example
    * // Find a book by its ID
    * const book = await findOne({ id: '123e4567-e89b-12d3-a456-426614174000' });
-   * 
+   *
    * @example
    * // Find a book by creator's account ID and article
    * const book = await findOne({ creator_account_id: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
-   * 
+   *
    * @throws {Error} If the query fails or the parameters are invalid
    */
 
@@ -118,7 +129,6 @@ export class BookRepository {
   /** Find and filter books by specified parameters.
    *
    * Searches for book entries in the database using the provided criteria.
-
    * @param {Object} params - Parameters to search for a book.
    * @param {string} [params.creator_account_id] - The ID of the account that created the book.
    * @param {string} [params.title] - The book's title.
@@ -127,16 +137,15 @@ export class BookRepository {
    * @param {int} [params.size] - The size of the pool.
    * @param {int} [params.page] - The page.
    *
-   *
    * @returns {Promise<IFindBooksResponse>} - Returns the found books, total amount, amount of page and current page number.
    * @example
    * // Find books by a title
    * const books = await find({ title: 'test' });
-   * 
+   *
    * @example
    * // Find books by creator's account ID and article
    * const books = await find({ creator_account_id: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
-   * 
+   *
    * @throws {Error} If the query fails or the parameters are invalid
    */
 
@@ -177,12 +186,10 @@ export class BookRepository {
 
   /** Update a book.
    *
-   *
    * Updates a book with specified ID in the database using the provided data.
    * @param {string} id - The unique identifier of the book.
    * @param {Object} data - Parameters to be updated in the book.
    * @param {string} [data.articul] - The unique article identifier of the book.
-   *
    *
    * @returns {Promise<Book>} - Returns the updated book object.
    * @example
