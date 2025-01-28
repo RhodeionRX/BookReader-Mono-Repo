@@ -5,7 +5,6 @@ import { InitBookDto } from './dto/init-book.dto';
 import { GetAllBooksDto } from './dto/get-all-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { I18nEnum } from 'enums/i18n.enum';
-import { BookI18nService } from 'src/book_i18n/book_i18n.service';
 import { AddI18nDto } from './dto/add-i18n.dto';
 
 @Controller('book')
@@ -21,7 +20,6 @@ export class BookController {
   @MessagePattern('getAll')
   public async getAll(dto: GetAllBooksDto) {
     const response = await this.service.getAll(dto);
-
     return response;
   }
 
@@ -60,7 +58,6 @@ export class BookController {
   @MessagePattern('addI18n')
   public async addI18n({ id, dto }: { id: string; dto: AddI18nDto }) {
     const response = await this.service.addI18n(id, dto);
-
     return response;
   }
 }

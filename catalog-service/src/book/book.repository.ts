@@ -150,14 +150,7 @@ export class BookRepository {
    */
 
   public async find(params: IFindBooksParams): Promise<IFindBooksResponse> {
-    const {
-      creator_account_id,
-      title,
-      i18n,
-      articul,
-      size = 10,
-      page = 1,
-    } = params;
+    const { creator_account_id, title, articul, size = 10, page = 1 } = params;
 
     const whereClause = {
       ...(creator_account_id && { creator_account_id }),
@@ -166,7 +159,6 @@ export class BookRepository {
 
     const i18nWhereClause = {
       ...(title && { title: { [Op.iLike]: `%${title}%` } }),
-      ...(i18n && { i18n }),
     };
 
     const offset = page * size - size;
@@ -176,6 +168,7 @@ export class BookRepository {
       include: {
         model: BookI18n,
         where: i18nWhereClause,
+        required: true,
       },
       limit: size,
       offset,
