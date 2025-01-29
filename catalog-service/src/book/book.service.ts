@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { Book } from './book.model';
 import { InitBookDto } from './dto/init-book.dto';
-import { BookI18nService } from 'src/book_i18n/book_i18n.service';
 import { RpcException } from '@nestjs/microservices';
 import { GetAllBooksDto } from './dto/get-all-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
@@ -11,11 +9,7 @@ import { AddI18nDto } from './dto/add-i18n.dto';
 import { BookRepository } from './book.repository';
 @Injectable()
 export class BookService {
-  constructor(
-    @InjectModel(Book) private repositoryOld: typeof Book,
-    private repository: BookRepository,
-    private bookI18nService: BookI18nService,
-  ) {}
+  constructor(private repository: BookRepository) {}
 
   public async create(dto: InitBookDto) {
     try {
@@ -30,7 +24,7 @@ export class BookService {
         throw new RpcException('Book is not created');
       }
 
-      const translations = await this.bookI18nService.create({
+      const translations = await this.repository.addI18n({
         bookId: book.id,
         i18n,
         title,
@@ -92,7 +86,7 @@ export class BookService {
     const { articul } = dto;
 
     const book = await this.repository.update(id, { articul });
-    const translations = await this.bookI18nService.update(id, i18n, dto);
+    const translations = await this.repository.updateI18n(id, i18n, dto);
 
     // TODO get rid of JSON.stringify
     const cleanBook = JSON.parse(JSON.stringify(book));
@@ -108,13 +102,15 @@ export class BookService {
   public async addI18n(id: string, dto: AddI18nDto) {
     const book = await this.repository.findOneOrFail({ id });
 
-    const bookI18nCandidate = await this.bookI18nService.getOne(id, dto.i18n);
+    const bookI18nCandidate = book.translations.find(
+      (translation) => translation.i18n === dto.i18n,
+    );
 
     if (bookI18nCandidate) {
       throw new RpcException('This localization already added');
     }
 
-    const translations = await this.bookI18nService.create({
+    const translations = await this.repository.addI18n({
       bookId: id,
       ...dto,
     });

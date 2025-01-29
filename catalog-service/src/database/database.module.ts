@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Book } from 'src/book/book.model';
-import { BookI18n } from 'src/book_i18n/book_i18n.model';
+import { BookI18n } from 'src/book/book.i18n.model';
 
 @Module({
   imports: [

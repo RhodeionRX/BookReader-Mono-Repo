@@ -1,20 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Book } from './book.model';
-import { CreationAttributes } from 'sequelize/types/model';
+import { CreationAttributes, ModelAttributes } from 'sequelize/types/model';
 import { RpcException } from '@nestjs/microservices';
 import { I18nEnum } from 'enums/i18n.enum';
-import { BookI18n } from 'src/book_i18n/book_i18n.model';
+import { BookI18n } from 'src/book/book.i18n.model';
 import { Op } from 'sequelize';
 import {
   IFindBooksParams,
   IFindBooksResponse,
   IFindOneBookParams,
 } from './interfaces';
+import { Col, Fn, Literal } from 'sequelize/types/utils';
 
 @Injectable()
 export class BookRepository {
-  constructor(@InjectModel(Book) private model: typeof Book) {}
+  constructor(
+    @InjectModel(Book) private bookModel: typeof Book,
+    @InjectModel(BookI18n) private i18nModel: typeof BookI18n,
+  ) {}
 
   /** Create a book by specified parameters.
    *
@@ -33,9 +37,34 @@ export class BookRepository {
    * });
    */
   public async create(data: CreationAttributes<Book>): Promise<Book | null> {
-    const book = await this.model.create(data);
+    const book = await this.bookModel.create(data);
 
     return book;
+  }
+
+  public async addI18n(data: CreationAttributes<BookI18n>) {
+    const bookI18n = await this.i18nModel.create(data);
+    return bookI18n;
+  }
+
+  public async updateI18n(
+    bookId: string,
+    i18n: I18nEnum,
+    data: {
+      [key in keyof ModelAttributes<BookI18n>]?: ModelAttributes<BookI18n>[key];
+    },
+  ) {
+    const i18nInstance = await this.i18nModel.findOne({
+      where: {
+        bookId,
+        i18n,
+      },
+    });
+
+    i18nInstance.update(data);
+    i18nInstance.save();
+
+    return i18nInstance;
   }
 
   /** Find one book by specified parameters.
@@ -71,7 +100,7 @@ export class BookRepository {
       ...(createdAt && { createdAt }),
     };
 
-    const book = this.model.findOne({
+    const book = this.bookModel.findOne({
       where: whereClause,
       include: [
         {
@@ -152,7 +181,7 @@ export class BookRepository {
 
     const offset = page * size - size;
 
-    const bookList = await this.model.findAndCountAll({
+    const bookList = await this.bookModel.findAndCountAll({
       where: whereClause,
       include: {
         model: BookI18n,

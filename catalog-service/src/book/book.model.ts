@@ -7,7 +7,7 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
-import { BookI18n } from 'src/book_i18n/book_i18n.model';
+import { BookI18n } from 'src/book/book.i18n.model';
 
 @Table({
   tableName: 'books',
