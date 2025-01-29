@@ -31,11 +31,8 @@ export class BookService {
         description,
       });
 
-      // TODO get rid of JSON.stringify
-      const cleanBook = JSON.parse(JSON.stringify(book));
-
       const result = {
-        ...cleanBook,
+        ...book.toJSON(),
         translations,
       };
 
@@ -88,11 +85,8 @@ export class BookService {
     const book = await this.repository.update(id, { articul });
     const translations = await this.repository.updateI18n(id, i18n, dto);
 
-    // TODO get rid of JSON.stringify
-    const cleanBook = JSON.parse(JSON.stringify(book));
-
     const result = {
-      ...cleanBook,
+      ...book.toJSON(),
       translations,
     };
 
@@ -115,11 +109,8 @@ export class BookService {
       ...dto,
     });
 
-    // TODO get rid of JSON.stringify
-    const cleanBook = JSON.parse(JSON.stringify(book));
-
     const result = {
-      ...cleanBook,
+      ...book.toJSON(),
       translations,
     };
 
