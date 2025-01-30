@@ -11,7 +11,6 @@ import {
   IFindBooksResponse,
   IFindOneBookParams,
 } from './interfaces';
-import { Col, Fn, Literal } from 'sequelize/types/utils';
 
 @Injectable()
 export class BookRepository {
@@ -42,18 +41,53 @@ export class BookRepository {
     return book;
   }
 
-  public async addI18n(data: CreationAttributes<BookI18n>) {
+  /** Add an internationalization to a specified book.
+   *
+   * Creates a book i18n record in the database.
+   *
+   * @param {Object} data - Parameters to search for a book.
+   * @param {string} [data.title] - The title in specified language of the book.
+   * @param {string} [data.description] - The description in specified language of the book.
+   *
+   * @returns {Promise<BookI18n|null>} - Returns the found book object if exists, otherwise `null`.
+   * @example
+   * // Add a new translation
+   * const book = await addI18n({
+   *   title: 'test',
+   *   description: 'test description',
+   * });
+   */
+  public async addI18n(data: CreationAttributes<BookI18n>): Promise<BookI18n> {
     const bookI18n = await this.i18nModel.create(data);
     return bookI18n;
   }
 
+  /** Updates an internationalization of a specified book.
+   *
+   * Updates book's i18n record in the database.
+   *
+   * @param {Object} data - Parameters to search for a book.
+   * @param {string} [data.title] - The title in specified language of the book.
+   * @param {string} [data.description] - The description in specified language of the book.
+   *
+   * @returns {Promise<BookI18n|null>} - Returns the found book object if exists, otherwise `null`.
+   * @example
+   * // Add a new translation
+   * const book = await updateI18n(
+   * '123e4567-e89b-12d3-a456-426614174000',
+   * 'FRENCH'
+   * {
+   *   title: 'le livre de test',
+   *   description: 'une description',
+   * });
+   */
   public async updateI18n(
     bookId: string,
     i18n: I18nEnum,
     data: {
       [key in keyof ModelAttributes<BookI18n>]?: ModelAttributes<BookI18n>[key];
     },
-  ) {
+  ): Promise<BookI18n> {
     const i18nInstance = await this.i18nModel.findOne({
       where: {
         bookId,
@@ -68,7 +102,6 @@ export class BookRepository {
   }
 
   /** Find one book by specified parameters.
-   *
    *
    * Searches for a single book entry in the database using the provided criteria.
    * @param {Object} data - Parameters to search for a book.
