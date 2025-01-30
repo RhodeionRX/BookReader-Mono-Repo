@@ -80,41 +80,49 @@ export class BookService {
   }
 
   public async update(id: string, i18n: I18nEnum, dto: UpdateBookDto) {
-    const { articul } = dto;
+    try {
+      const { articul } = dto;
 
-    const book = await this.repository.update(id, { articul });
-    const translations = await this.repository.updateI18n(id, i18n, dto);
+      const book = await this.repository.update(id, { articul });
+      const translations = await this.repository.updateI18n(id, i18n, dto);
 
-    const result = {
-      ...book.toJSON(),
-      translations,
-    };
+      const result = {
+        ...book.toJSON(),
+        translations,
+      };
 
-    return result;
+      return result;
+    } catch (error) {
+      throw new RpcException(error.message ?? 'Unknown exception');
+    }
   }
 
   public async addI18n(id: string, dto: AddI18nDto) {
-    const book = await this.repository.findOneOrFail({ id });
+    try {
+      const book = await this.repository.findOneOrFail({ id });
 
-    const bookI18nCandidate = book.translations.find(
-      (translation) => translation.i18n === dto.i18n,
-    );
+      const bookI18nCandidate = book.translations.find(
+        (translation) => translation.i18n === dto.i18n,
+      );
 
-    if (bookI18nCandidate) {
-      throw new RpcException('This localization already added');
+      if (bookI18nCandidate) {
+        throw new RpcException('This localization already added');
+      }
+
+      const translations = await this.repository.addI18n({
+        bookId: id,
+        ...dto,
+      });
+
+      const result = {
+        ...book.toJSON(),
+        translations,
+      };
+
+      return result;
+    } catch (error) {
+      throw new RpcException(error.message ?? 'Unknown exception');
     }
-
-    const translations = await this.repository.addI18n({
-      bookId: id,
-      ...dto,
-    });
-
-    const result = {
-      ...book.toJSON(),
-      translations,
-    };
-
-    return result;
   }
 
   public async destroy(id: string) {
