@@ -10,6 +10,7 @@ import { TokenResponse } from './models/response/token.response';
 import { RpcException } from '@nestjs/microservices';
 import { Sequelize } from 'sequelize-typescript';
 import { AuthorizeDto } from './models/dto/authorize.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private accountService: AccountService,
     private userService: UserService,
     private jwtService: JwtService,
+    private configService: ConfigService,
     private sequelize: Sequelize,
   ) {}
 
@@ -67,12 +69,10 @@ export class AuthService {
 
   public async authorize(dto: AuthorizeDto): Promise<TokenResponse> {
     try {
-      const {login, email, password} = dto
+      const { login, email, password } = dto;
 
       if (!login && !email) {
-        throw new RpcException(
-          'No login or email is provided in the request',
-        );
+        throw new RpcException('No login or email is provided in the request');
       }
 
       const account = await this.accountService.getOne(dto);
@@ -88,14 +88,13 @@ export class AuthService {
       const token = await this.generateJwt(account);
 
       return new TokenResponse(token);
-    }
-    catch (err) {
+    } catch (err) {
       throw new RpcException(err.message || 'Authorization failed');
     }
   }
 
-
   private async generateJwt(account: Account | AccountResponse) {
+    const secret = this.configService.get<string>('SECRET');
     const payload = {
       id: account.id,
       login: account.login,
@@ -103,6 +102,6 @@ export class AuthService {
       emailConfirmed: account.emailConfirmed,
     };
 
-    return this.jwtService.signAsync(payload);
+    return this.jwtService.signAsync(payload, { secret });
   }
 }

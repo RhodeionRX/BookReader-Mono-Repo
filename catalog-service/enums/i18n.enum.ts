@@ -1,0 +1,7 @@
+export enum I18nEnum {
+  ENGLISH = 'ENGLISH',
+  RUSSIAN = 'RUSSIAN',
+  UKRAINIAN = 'UKRAINIAN',
+  POLISH = 'POLISH',
+  SPANISH = 'SPANISH',
+}
