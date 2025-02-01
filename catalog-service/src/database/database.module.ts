@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Book } from 'src/book/book.model';
 import { BookI18n } from 'src/book/book.i18n.model';
+import { BookParameter } from 'src/book/book-parameter.model';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { BookI18n } from 'src/book/book.i18n.model';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         autoLoadModels: false,
-        models: [Book, BookI18n],
+        models: [Book, BookI18n, BookParameter],
       }),
     }),
   ],
