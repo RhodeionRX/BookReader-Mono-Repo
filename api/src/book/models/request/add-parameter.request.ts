@@ -7,10 +7,10 @@ export class AddParameterRequest {
   public readonly i18n?: I18nEnum = I18nEnum.ENGLISH;
 
   @IsString()
-  @Length(3, 50)
+  @Length(1, 50)
   public readonly label: string;
 
   @IsString()
-  @Length(3, 50)
+  @Length(1, 50)
   public readonly value: string;
 }

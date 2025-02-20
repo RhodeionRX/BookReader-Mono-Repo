@@ -33,8 +33,6 @@ export class InitBookRequest {
 
   @IsArray()
   @IsOptional()
-  @ArrayMinSize(1)
-  @ArrayMaxSize(10)
   @ValidateNested({ each: true })
   @Type(() => AddParameterRequest)
   public readonly parameters?: AddParameterRequest[];
