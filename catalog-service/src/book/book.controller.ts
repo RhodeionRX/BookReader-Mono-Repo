@@ -26,7 +26,7 @@ export class BookController {
   @MessagePattern('getOne')
   public async getOne({
     id,
-    i18n = I18nEnum.ENGLISH,
+    i18n = I18nEnum.EN,
   }: {
     id: string;
     i18n: I18nEnum;

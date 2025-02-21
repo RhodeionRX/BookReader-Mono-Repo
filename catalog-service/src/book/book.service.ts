@@ -44,7 +44,7 @@ export class BookService {
 
   public async getAll(dto: GetAllBooksDto) {
     const { creator_account_id, title, i18n, articul, size, page } = dto;
-    const localization = i18n ?? I18nEnum.ENGLISH;
+    const localization = i18n ?? I18nEnum.EN;
 
     const books = await this.repository.find({
       creator_account_id,
@@ -71,7 +71,7 @@ export class BookService {
     };
   }
 
-  public async getOne(id: string, i18n: I18nEnum = I18nEnum.ENGLISH) {
+  public async getOne(id: string, i18n: I18nEnum = I18nEnum.EN) {
     const book = await this.repository.findOneOrFail({ id });
 
     const bookWithSpecifiedI18n = this.retrieveSingleTranslation(book, i18n);
@@ -141,7 +141,7 @@ export class BookService {
     // If not translation found attempt to search one with english localization
     if (!translation) {
       translation = book.translations.find(
-        (translation) => translation.i18n === I18nEnum.ENGLISH,
+        (translation) => translation.i18n === I18nEnum.EN,
       );
     }
 

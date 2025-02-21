@@ -4,7 +4,7 @@ import { I18nEnum } from 'enums/I18n.enum';
 export class AddParameterRequest {
   @IsEnum(I18nEnum)
   @IsOptional()
-  public readonly i18n?: I18nEnum = I18nEnum.ENGLISH;
+  public readonly i18n?: I18nEnum = I18nEnum.EN;
 
   @IsString()
   @Length(1, 50)

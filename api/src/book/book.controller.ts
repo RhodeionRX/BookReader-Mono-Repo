@@ -81,7 +81,7 @@ export class BookController {
   @Get('/:id')
   public async findOne(
     @Param('id') id: string,
-    @Query('lng') lng: I18nEnum = I18nEnum.ENGLISH,
+    @Query('lng') lng: I18nEnum = I18nEnum.EN,
   ): Promise<BookResponse> {
     const payload = { id, i18n: lng };
     const result = await this.serviceHandler.send('getOne', payload);

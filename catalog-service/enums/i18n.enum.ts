@@ -1,7 +1,8 @@
 export enum I18nEnum {
-  ENGLISH = 'ENGLISH',
-  RUSSIAN = 'RUSSIAN',
-  UKRAINIAN = 'UKRAINIAN',
-  POLISH = 'POLISH',
-  SPANISH = 'SPANISH',
+  EN = 'EN', // English
+  FR = 'FR', // French
+  RU = 'RU', // Russian
+  UK = 'UK', // Ukrainian
+  PL = 'PL', // Polish
+  ES = 'ES', // Spanish
 }

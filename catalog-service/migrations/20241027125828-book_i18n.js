@@ -3,17 +3,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const I18nEnum = {
-      ENGLISH: 'ENGLISH',
-      RUSSIAN: 'RUSSIAN',
-      UKRAINIAN: 'UKRAINIAN',
-      POLISH: 'POLISH',
-      SPANISH: 'SPANISH'
-    };
-
     await queryInterface.createTable('book_i18n', {
       i18n: {
-        type: Sequelize.ENUM(...Object.values(I18nEnum)),
+        type: Sequelize.STRING(3),
         allowNull: false,
         primaryKey: true,
       },
