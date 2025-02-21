@@ -5,7 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Book } from './book.model';
 import { BookI18n } from 'src/book/book.i18n.model';
 import { BookRepository } from './book.repository';
-import { BookParameter } from './book-parameter.model';
+import { BookParameter } from './book.parameter.model';
 
 @Module({
   imports: [SequelizeModule.forFeature([Book, BookI18n, BookParameter])],

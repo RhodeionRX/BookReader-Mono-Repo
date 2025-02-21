@@ -12,8 +12,8 @@ export class BookController {
   constructor(private service: BookService) {}
 
   @MessagePattern('init')
-  public async init(initBookDto: InitBookDto) {
-    const book = await this.service.create(initBookDto);
+  public async init(dto: InitBookDto) {
+    const book = await this.service.create(dto);
     return book;
   }
 

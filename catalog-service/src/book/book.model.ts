@@ -8,7 +8,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { BookI18n } from 'src/book/book.i18n.model';
-import { BookParameter } from './book-parameter.model';
+import { BookParameter } from './book.parameter.model';
 
 @Table({
   tableName: 'books',

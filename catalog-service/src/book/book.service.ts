@@ -7,13 +7,15 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { I18nEnum } from 'enums/i18n.enum';
 import { AddI18nDto } from './dto/add-i18n.dto';
 import { BookRepository } from './book.repository';
+import { BookParameter } from './book.parameter.model';
+
 @Injectable()
 export class BookService {
   constructor(private repository: BookRepository) {}
 
   public async create(dto: InitBookDto) {
     try {
-      const { articul, userId, title, i18n, description } = dto;
+      const { articul, userId, title, i18n, description, parameters } = dto;
 
       const book = await this.repository.create({
         creator_account_id: userId,
@@ -31,9 +33,20 @@ export class BookService {
         description,
       });
 
+      let bookParameters: BookParameter[] = [];
+
+      if (parameters) {
+        bookParameters = await this.repository.addParameters(
+          parameters,
+          book.id,
+          i18n,
+        );
+      }
+
       const result = {
         ...book.toJSON(),
         translations,
+        ...(bookParameters && { parameters: bookParameters }),
       };
 
       return result;

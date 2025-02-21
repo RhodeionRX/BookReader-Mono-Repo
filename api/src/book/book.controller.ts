@@ -59,7 +59,7 @@ export class BookController {
 
     const book = result as Book;
 
-    return new BookResponse(book, book.translations);
+    return new BookResponse(book, book.translations, book.parameters);
   }
 
   @Version('1')
@@ -88,7 +88,7 @@ export class BookController {
 
     const book = result as Book;
 
-    return new BookResponse(book, book.translations);
+    return new BookResponse(book, book.translations, book.parameters);
   }
 
   @Version('1')

@@ -12,7 +12,9 @@ export class AllBooksResponse {
     page: number,
     size: number,
   ) {
-    this.books = rows.map((book) => new BookResponse(book, book.translations));
+    this.books = rows.map(
+      (book) => new BookResponse(book, book.translations, book.parameters),
+    );
     this.total = count;
     this.page = page;
     this.pageTotal = Math.ceil(count / size);
