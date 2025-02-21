@@ -1,5 +1,5 @@
 import { I18nEnum } from 'enums/I18n.enum';
-import { Book, BookTranslation } from '../entity';
+import { Book, BookParameter, BookTranslation } from '../entity';
 
 export class BookResponse {
   id: string;
@@ -8,10 +8,15 @@ export class BookResponse {
   creatorAccountId: string;
   articul?: string;
   i18n: I18nEnum;
+  parameters?: Pick<BookParameter, 'label' | 'value'>[];
   createdAt: Date;
   updatedAt: Date;
 
-  constructor(book: Book, translations?: BookTranslation[] | BookTranslation) {
+  constructor(
+    book: Book,
+    translations?: BookTranslation[] | BookTranslation,
+    parameters?: BookParameter[],
+  ) {
     this.id = book.id;
     this.articul = book.articul ?? undefined;
 
@@ -24,6 +29,14 @@ export class BookResponse {
       this.description = translations.description ?? undefined;
       this.i18n = translations.i18n;
     }
+
+    if (parameters.length > 0) {
+      this.parameters = parameters.map(({ label, value }) => ({
+        label,
+        value,
+      }));
+    }
+
     this.creatorAccountId = book.creator_account_id;
     this.createdAt = book.createdAt;
     this.updatedAt = book.updatedAt;

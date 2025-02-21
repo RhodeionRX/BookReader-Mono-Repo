@@ -5,5 +5,5 @@ export interface IFindOneBookParams {
   creator_account_id?: string;
   articul?: string;
   createdAt?: Date;
-  // i18n?: I18nEnum;
+  i18n?: I18nEnum;
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Book } from './book.model';
 import { CreationAttributes, ModelAttributes } from 'sequelize/types/model';
@@ -10,13 +10,16 @@ import {
   IFindBooksParams,
   IFindBooksResponse,
   IFindOneBookParams,
+  IParameter,
 } from './interfaces';
+import { BookParameter } from './book.parameter.model';
 
 @Injectable()
 export class BookRepository {
   constructor(
     @InjectModel(Book) private bookModel: typeof Book,
     @InjectModel(BookI18n) private i18nModel: typeof BookI18n,
+    @InjectModel(BookParameter) private paramModel: typeof BookParameter,
   ) {}
 
   /** Create a book by specified parameters.
@@ -62,6 +65,40 @@ export class BookRepository {
     return bookI18n;
   }
 
+  /** Creates a list of parameters for the book depending on its internalization.
+   *
+   * Creates a list of book parameters in the data base.
+   *
+   * @param {IParameter[]} params - List of parameters.
+   * @param {string} [bookId] - The book identifier.
+   * @param {I18nEnum} [i18n] - The language of the parameters value.
+   *
+   * @returns {Promise<BookParameter[]|null>} - Returns the list of parameters or null.
+   * @example
+   * // Add a parameters
+   * const parameters = await addParameters(
+   * [{label: 'Some label', value: 'Some value'}],
+   * '123e4567-e89b-12d3-a456-426614174000',
+   * 'FR'
+   * })
+   */
+  public async addParameters(
+    params: IParameter[],
+    bookId: string,
+    i18n: I18nEnum,
+  ): Promise<BookParameter[] | null> {
+    const preparedParameters = params.map((param) => {
+      return {
+        ...param,
+        bookId,
+        i18n,
+      };
+    });
+
+    const paramList = await this.paramModel.bulkCreate(preparedParameters);
+    return paramList;
+  }
+
   /** Updates an internationalization of a specified book.
    *
    * Updates book's i18n record in the database.
@@ -75,7 +112,7 @@ export class BookRepository {
    * // Add a new translation
    * const book = await updateI18n(
    * '123e4567-e89b-12d3-a456-426614174000',
-   * 'FRENCH'
+   * 'FR'
    * {
    *   title: 'le livre de test',
    *   description: 'une description',
@@ -124,7 +161,7 @@ export class BookRepository {
    */
 
   public async findOne(data: IFindOneBookParams): Promise<Book | null> {
-    const { id, creator_account_id, createdAt, articul } = data;
+    const { id, creator_account_id, createdAt, articul, i18n } = data;
 
     const whereClause = {
       ...(id && { id }),
@@ -139,6 +176,12 @@ export class BookRepository {
         {
           model: BookI18n,
           as: 'translations',
+        },
+        {
+          model: BookParameter,
+          as: 'parameters',
+          where: { ...(i18n && { i18n: i18n }) },
+          required: false,
         },
       ],
     });
@@ -216,11 +259,19 @@ export class BookRepository {
 
     const bookList = await this.bookModel.findAndCountAll({
       where: whereClause,
-      include: {
-        model: BookI18n,
-        where: i18nWhereClause,
-        required: true,
-      },
+      include: [
+        {
+          model: BookI18n,
+          where: i18nWhereClause,
+          required: true,
+        },
+        {
+          model: BookParameter,
+          as: 'parameters',
+          required: false,
+        },
+      ],
+      order: [['createdAt', 'DESC']],
       limit: size,
       offset,
     });

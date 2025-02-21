@@ -15,11 +15,9 @@ import {
   Query,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { catchError, lastValueFrom, Observable, throwError } from 'rxjs';
 import { User } from 'src/user/user.decorator';
 import { IUser } from 'src/user/entities/user.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { handleMicroserviceException } from 'src/utils';
 import { I18nEnum } from 'enums/I18n.enum';
 import {
   AddI18nRequest,
@@ -28,15 +26,21 @@ import {
   UpdateBookRequest,
 } from './models/request';
 import { AllBooksResponse, BookResponse } from './models/response';
-import { Book, BookTranslation } from './models/entity';
+import { Book } from './models/entity';
 import { GetAllBooksResponse } from './models/interfaces';
+import { ServiceHandler } from 'src/services/service-handler';
+import { instanceToPlain } from 'class-transformer';
 
 @Controller('book')
 export class BookController {
+  private serviceHandler: ServiceHandler;
+
   constructor(
     @Inject('CATALOGUE_SERVICE')
     private readonly catalogueServiceClient: ClientProxy,
-  ) {}
+  ) {
+    this.serviceHandler = new ServiceHandler(catalogueServiceClient);
+  }
 
   // TODO: add cache
   @Version('1')
@@ -47,15 +51,15 @@ export class BookController {
     @Body() dto: InitBookRequest,
     @User() user: IUser,
   ): Promise<BookResponse> {
-    const result: unknown = await lastValueFrom(
-      this.catalogueServiceClient
-        .send('init', { ...dto, userId: user.id })
-        .pipe(catchError(handleMicroserviceException)),
-    );
+    const payload = {
+      ...dto,
+      userId: user.id,
+    };
+    const result = await this.serviceHandler.send('init', payload);
 
     const book = result as Book;
 
-    return new BookResponse(book, book.translations);
+    return new BookResponse(book, book.translations, book.parameters);
   }
 
   @Version('1')
@@ -63,12 +67,9 @@ export class BookController {
   @Get()
   public async findAll(
     @Query() query: GetAllBooksRequest,
-  ): Promise<AllBooksResponse | any> {
-    const result: unknown = await lastValueFrom(
-      this.catalogueServiceClient
-        .send('getAll', query)
-        .pipe(catchError(handleMicroserviceException)),
-    );
+  ): Promise<AllBooksResponse> {
+    const payload = instanceToPlain(query);
+    const result = await this.serviceHandler.send('getAll', payload);
 
     const books = result as GetAllBooksResponse;
 
@@ -80,17 +81,14 @@ export class BookController {
   @Get('/:id')
   public async findOne(
     @Param('id') id: string,
-    @Query('lng') lng: I18nEnum = I18nEnum.ENGLISH,
+    @Query('lng') lng: I18nEnum = I18nEnum.EN,
   ): Promise<BookResponse> {
-    const result: unknown = await lastValueFrom(
-      this.catalogueServiceClient
-        .send('getOne', { id, i18n: lng })
-        .pipe(catchError(handleMicroserviceException)),
-    );
+    const payload = { id, i18n: lng };
+    const result = await this.serviceHandler.send('getOne', payload);
 
     const book = result as Book;
 
-    return new BookResponse(book, book.translations);
+    return new BookResponse(book, book.translations, book.parameters);
   }
 
   @Version('1')
@@ -112,11 +110,8 @@ export class BookController {
       );
     }
 
-    const result: unknown = await lastValueFrom(
-      this.catalogueServiceClient
-        .send('update', { id, i18n, dto })
-        .pipe(catchError(handleMicroserviceException)),
-    );
+    const payload = { id, i18n, dto };
+    const result = await this.serviceHandler.send('update', payload);
 
     const book = result as Book;
 
@@ -131,11 +126,8 @@ export class BookController {
     @Param('id') id: string,
     @Body() dto: AddI18nRequest,
   ): Promise<BookResponse> {
-    const result: unknown = await lastValueFrom(
-      this.catalogueServiceClient
-        .send('addI18n', { id, dto })
-        .pipe(catchError(handleMicroserviceException)),
-    );
+    const payload = { id, dto };
+    const result = await this.serviceHandler.send('addI18n', payload);
 
     const book = result as Book;
 
@@ -147,11 +139,8 @@ export class BookController {
   @Delete('/:id')
   @UseGuards(AuthGuard)
   public async remove(@Param('id') id: string) {
-    const result = await lastValueFrom(
-      this.catalogueServiceClient
-        .send('destroy', id)
-        .pipe(catchError(handleMicroserviceException)),
-    );
+    const payload = id;
+    const result = await this.serviceHandler.send('destroy', payload);
 
     const book = result as Book;
 

@@ -3,19 +3,11 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const I18nEnum = {
-      ENGLISH: 'ENGLISH',
-      RUSSIAN: 'RUSSIAN',
-      UKRAINIAN: 'UKRAINIAN',
-      POLISH: 'POLISH',
-      SPANISH: 'SPANISH'
-    };
-
     await queryInterface.createTable('book_parameters', {
       i18n: {
-        type: Sequelize.ENUM(...Object.values(I18nEnum)),
+        type: Sequelize.STRING(3),
         allowNull: false,
-        primaryKey: true,  
+        primaryKey: true,
       },
       label: {
         type: Sequelize.STRING(50),
@@ -32,7 +24,7 @@ module.exports = {
           model: 'books',
           key: 'id',
         },
-        primaryKey: true, 
+        primaryKey: true,
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },

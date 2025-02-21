@@ -12,8 +12,8 @@ export class BookController {
   constructor(private service: BookService) {}
 
   @MessagePattern('init')
-  public async init(initBookDto: InitBookDto) {
-    const book = await this.service.create(initBookDto);
+  public async init(dto: InitBookDto) {
+    const book = await this.service.create(dto);
     return book;
   }
 
@@ -26,7 +26,7 @@ export class BookController {
   @MessagePattern('getOne')
   public async getOne({
     id,
-    i18n = I18nEnum.ENGLISH,
+    i18n = I18nEnum.EN,
   }: {
     id: string;
     i18n: I18nEnum;
