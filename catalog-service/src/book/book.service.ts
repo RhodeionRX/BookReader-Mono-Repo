@@ -8,6 +8,7 @@ import { I18nEnum } from 'enums/i18n.enum';
 import { AddI18nDto } from './dto/add-i18n.dto';
 import { BookRepository } from './book.repository';
 import { BookParameter } from './book.parameter.model';
+import { BookI18n } from './book.i18n.model';
 
 @Injectable()
 export class BookService {
@@ -65,6 +66,7 @@ export class BookService {
       articul,
       size,
       page,
+      i18n: localization,
     });
 
     const booksWithAppliedI18n = [];
@@ -85,7 +87,7 @@ export class BookService {
   }
 
   public async getOne(id: string, i18n: I18nEnum = I18nEnum.EN) {
-    const book = await this.repository.findOneOrFail({ id });
+    const book = await this.repository.findOneOrFail({ id, i18n });
 
     const bookWithSpecifiedI18n = this.retrieveSingleTranslation(book, i18n);
 
@@ -144,7 +146,8 @@ export class BookService {
   }
 
   private retrieveSingleTranslation(book: Book, i18n: I18nEnum) {
-    let translation = {};
+    let translation: BookI18n | any = {};
+    let parameters = [];
 
     // Search the translation matching requested localization
     translation = book.translations.find(
@@ -163,6 +166,10 @@ export class BookService {
       translation = book.translations[0] ?? null;
     }
 
-    return { ...book.toJSON(), translations: translation };
+    parameters = book.parameters.filter(
+      (param) => param.i18n === translation.i18n,
+    );
+
+    return { ...book.toJSON(), translations: translation, parameters };
   }
 }

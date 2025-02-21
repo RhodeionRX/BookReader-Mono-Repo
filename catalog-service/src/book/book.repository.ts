@@ -161,7 +161,7 @@ export class BookRepository {
    */
 
   public async findOne(data: IFindOneBookParams): Promise<Book | null> {
-    const { id, creator_account_id, createdAt, articul } = data;
+    const { id, creator_account_id, createdAt, articul, i18n } = data;
 
     const whereClause = {
       ...(id && { id }),
@@ -180,6 +180,8 @@ export class BookRepository {
         {
           model: BookParameter,
           as: 'parameters',
+          where: { ...(i18n && { i18n: i18n }) },
+          required: false,
         },
       ],
     });
@@ -269,6 +271,7 @@ export class BookRepository {
           required: false,
         },
       ],
+      order: [['createdAt', 'DESC']],
       limit: size,
       offset,
     });

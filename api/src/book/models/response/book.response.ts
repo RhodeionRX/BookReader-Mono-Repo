@@ -30,7 +30,7 @@ export class BookResponse {
       this.i18n = translations.i18n;
     }
 
-    if (parameters) {
+    if (parameters.length > 0) {
       this.parameters = parameters.map(({ label, value }) => ({
         label,
         value,
