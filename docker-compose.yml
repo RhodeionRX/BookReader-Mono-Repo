@@ -23,6 +23,18 @@ services:
     volumes:
       - catalogue_db:/var/lib/postgresql/data
 
+  file_db:
+    image: postgres:latest
+    container_name: file_db
+    ports:
+      - "${FILE_DB_PORT}:5432"
+    environment:
+      POSTGRES_USER: ${FILE_DB_USERNAME}
+      POSTGRES_PASSWORD: ${FILE_DB_PASSWORD}
+      POSTGRES_DB: ${FILE_DB_NAME}
+    volumes:
+      - file_db:/var/lib/postgresql/data
+
   rabbitmq:
     image: rabbitmq:management
     container_name: rabbitmq
@@ -39,4 +51,5 @@ services:
 volumes:
   user_db:
   catalogue_db:
+  file_db:
   rabbitmq_data:
