@@ -45,18 +45,20 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('authorize')
   public async authorize(
-    @Body() authorizeRequest: AuthorizeRequest
+    @Body() authorizeRequest: AuthorizeRequest,
   ): Promise<Observable<any>> {
     return this.userServiceClient.send('authorize', authorizeRequest).pipe(
       catchError((error) => {
-        return throwError(() => 
-          new HttpException(
-            {
-              status: HttpStatus.BAD_REQUEST,
-              message: error.message || 'Authorization failed',
-            },
-            HttpStatus.BAD_REQUEST
-          ));
+        return throwError(
+          () =>
+            new HttpException(
+              {
+                status: HttpStatus.BAD_REQUEST,
+                message: error.message || 'Authorization failed',
+              },
+              HttpStatus.BAD_REQUEST,
+            ),
+        );
       }),
     );
   }

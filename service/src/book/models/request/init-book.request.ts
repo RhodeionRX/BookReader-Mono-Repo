@@ -1,6 +1,4 @@
 import {
-  ArrayMaxSize,
-  ArrayMinSize,
   IsArray,
   IsEnum,
   IsNotEmpty,
@@ -8,7 +6,6 @@ import {
   IsString,
   Length,
   ValidateNested,
-  ValidatorConstraint,
 } from 'class-validator';
 import { I18nEnum } from 'enums/I18n.enum';
 import { AddParameterRequest } from './add-parameter.request';
