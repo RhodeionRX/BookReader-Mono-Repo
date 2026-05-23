@@ -1,4 +1,4 @@
-import { User } from 'src/users/user.model';
+import { User } from 'src/users/users.model';
 
 export class UserResponse {
   id: string;

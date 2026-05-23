@@ -1,6 +1,5 @@
 import {
   ArgumentMetadata,
-  BadRequestException,
   HttpStatus,
   Injectable,
   PipeTransform,
@@ -17,7 +16,10 @@ export class ValidationPipe implements PipeTransform<any> {
     }
 
     const object = plainToInstance(metadata.metatype, value);
-    const errors = await validate(object);
+    
+    const errors = await validate(object, {
+      forbidUnknownValues: false
+    });
 
     if (errors.length > 0) {
       const errorMessages = this.prepareErrorList(errors);

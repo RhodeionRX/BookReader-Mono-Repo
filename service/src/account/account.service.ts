@@ -3,7 +3,7 @@ import { CreateAccountDto } from './models/dto/create-account.dto';
 import { AccountSearchParams } from './models/dto/account-search-params.dto';
 import { Account } from './account.model';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from 'src/users/user.model';
+import { User } from 'src/users/users.model';
 import { AccountResponse } from './models/response/account.response';
 import { AccountsResponse } from './models/response/accounts.response';
 import { Transaction } from 'sequelize';
@@ -30,12 +30,7 @@ export class AccountService {
 
     const accounts = await this.repository.findAll({
       where: whereClause,
-      include: [
-        {
-          model: User,
-          as: 'user',
-        },
-      ],
+      include: [{ model: User, as: 'user' }],
     });
 
     return new AccountsResponse(accounts);
@@ -48,16 +43,11 @@ export class AccountService {
 
     if (query.email) whereClause.email = query.email;
 
-    if (query.login) whereClause.login = query.login
+    if (query.login) whereClause.login = query.login;
 
     const account = await this.repository.findOne({
       where: whereClause,
-      include: [
-        {
-          model: User, 
-          as: 'user'
-        }
-      ]
+      include: [{ model: User, as: 'user' }],
     });
 
     return account;

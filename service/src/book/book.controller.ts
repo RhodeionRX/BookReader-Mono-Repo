@@ -15,8 +15,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { User } from 'src/user/user.decorator';
-import { IUser } from 'src/user/entities/user.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { I18nEnum } from 'enums/I18n.enum';
 import {
@@ -30,6 +28,8 @@ import { Book } from './models/entity';
 import { GetAllBooksResponse } from './models/interfaces';
 import { ServiceHandler } from 'src/services/service-handler';
 import { instanceToPlain } from 'class-transformer';
+import { User } from 'src/users/users.model';
+import { AuthUser } from 'src/users/user.decorator';
 
 @Controller('book')
 export class BookController {
@@ -49,7 +49,7 @@ export class BookController {
   @Post('/init')
   public async init(
     @Body() dto: InitBookRequest,
-    @User() user: IUser,
+    @AuthUser() user: User,
   ): Promise<BookResponse> {
     const payload = {
       ...dto,

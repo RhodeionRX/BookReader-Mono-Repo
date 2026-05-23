@@ -1,16 +1,16 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { AccountService } from 'src/account/account.service';
 import { RegisterDto } from './models/dto/register.dto';
-import { UserService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Account } from 'src/account/account.model';
 import { AccountResponse } from 'src/account/models/response/account.response';
 import { JwtService } from '@nestjs/jwt';
 import { TokenResponse } from './models/response/token.response';
 import { RpcException } from '@nestjs/microservices';
-import { Sequelize } from 'sequelize-typescript';
-import { AuthorizeDto } from './models/dto/authorize.dto';
 import { ConfigService } from '@nestjs/config';
+import { UserService } from 'src/users/users.service';
+import { AuthorizeDto } from './models/dto/authorize.dto';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class AuthService {
@@ -37,10 +37,7 @@ export class AuthService {
       return await this.sequelize.transaction(async (transaction) => {
         const hashPassword = await bcrypt.hash(dto.password, 10);
         const account = await this.accountService.create(
-          {
-            email: dto.email,
-            password: hashPassword,
-          },
+          { email: dto.email, password: hashPassword },
           transaction,
         );
 

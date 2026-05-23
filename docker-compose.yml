@@ -1,27 +1,15 @@
 services:
-  user_db:
-    image: postgres:latest
-    container_name: user-db
+  db:
+    image: postgres:17
+    container_name: db
     ports:
-      - "${USER_DB_PORT}:5432"
+      - "${DB_PORT}:5432"
     environment:
-      POSTGRES_USER: ${USER_DB_USERNAME}
-      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
-      POSTGRES_DB: ${USER_DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
-      - user_db:/var/lib/postgresql/data
-
-  catalogue_db:
-    image: postgres:latest
-    container_name: catalogue-db
-    ports:
-      - "${CATALOGUE_DB_PORT}:5432"
-    environment:
-      POSTGRES_USER: ${CATALOGUE_DB_USERNAME}
-      POSTGRES_PASSWORD: ${CATALOGUE_DB_PASSWORD}
-      POSTGRES_DB: ${CATALOGUE_DB_NAME}
-    volumes:
-      - catalogue_db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
 
   rabbitmq:
     image: rabbitmq:management
@@ -37,6 +25,5 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
-  user_db:
-  catalogue_db:
+  db:
   rabbitmq_data:

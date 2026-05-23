@@ -1,6 +1,6 @@
 import { Account } from 'src/account/account.model';
 import { UserResponse } from 'src/users/models/response/user.response';
-import { User } from 'src/users/user.model';
+import { User } from 'src/users/users.model';
 
 export class AccountResponse {
   id: string;

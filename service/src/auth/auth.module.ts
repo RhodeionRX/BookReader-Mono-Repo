@@ -1,31 +1,26 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthService } from './auth.service';
+import { AccountModule } from 'src/account/account.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  controllers: [AuthController],
-  providers: [],
   imports: [
-    ClientsModule,
-    ClientsModule.registerAsync([
-      {
-        name: 'USER_SERVICE',
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.RMQ,
-          options: {
-            urls: [
-              `${configService.get<string>('BROKER_HOST')}:${configService.get<string>('BROKER_PORT')}`,
-            ],
-            queue: 'user_queue',
-            queueOptions: {
-              durable: false,
-            },
-          },
-        }),
-        inject: [ConfigService],
-      },
-    ]),
+    forwardRef(() => UsersModule),
+    forwardRef(() => AccountModule),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('SECRET') || 'SECRET',
+        signOptions: { expiresIn: '2w' },
+      }),
+    }),
   ],
+  controllers: [AuthController],
+  providers: [AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

@@ -9,10 +9,12 @@ export class ValidationExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
 
-    response.status(status).json({
-      statusCode: status,
-      message: exception.message,
-      errors: exception.getErrors(),
-    });
+    response
+      .status(status)
+      .json({
+        statusCode: status,
+        message: exception.message,
+        errors: exception.getErrors(),
+      });
   }
 }
