@@ -3,19 +3,28 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { VersioningType } from '@nestjs/common';
 import { ValidationPipe } from './pipes/validation.pipe';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   const configService = app.get(ConfigService);
   const PORT = configService.get<number>('PORT') || 3500;
 
   app.setGlobalPrefix('api');
 
-  app.enableVersioning({
-    type: VersioningType.URI,
-  });
+  app.enableVersioning({ type: VersioningType.URI });
 
   app.useGlobalPipes(new ValidationPipe());
+
+  const config = new DocumentBuilder()
+    .setTitle('BoockReader project')
+    .setDescription('The BookReader API description')
+    .setVersion('0.1')
+    .build();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(PORT);
   console.log(`Application running on Port ${PORT}`);
