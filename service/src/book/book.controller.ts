@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Inject,
   HttpException,
   HttpStatus,
   Version,
@@ -14,7 +13,6 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { I18nEnum } from 'enums/I18n.enum';
 import {
@@ -24,23 +22,14 @@ import {
   UpdateBookRequest,
 } from './models/request';
 import { AllBooksResponse, BookResponse } from './models/response';
-import { Book } from './models/entity';
-import { GetAllBooksResponse } from './models/interfaces';
-import { ServiceHandler } from 'src/services/service-handler';
-import { instanceToPlain } from 'class-transformer';
 import { User } from 'src/users/users.model';
 import { AuthUser } from 'src/users/user.decorator';
+import { BookService } from './book.service';
 
 @Controller('book')
 export class BookController {
-  private serviceHandler: ServiceHandler;
+  constructor(private service: BookService) {}
 
-  constructor(
-    @Inject('CATALOGUE_SERVICE')
-    private readonly catalogueServiceClient: ClientProxy,
-  ) {
-    this.serviceHandler = new ServiceHandler(catalogueServiceClient);
-  }
 
   // TODO: add cache
   @Version('1')
@@ -48,18 +37,17 @@ export class BookController {
   @UseGuards(AuthGuard)
   @Post('/init')
   public async init(
-    @Body() dto: InitBookRequest,
+    @Body() request: InitBookRequest,
     @AuthUser() user: User,
   ): Promise<BookResponse> {
-    const payload = {
-      ...dto,
+    const dto = {
+      ...request,
       userId: user.id,
     };
-    const result = await this.serviceHandler.send('init', payload);
 
-    const book = result as Book;
+    const {book, translations, parameters} = await this.service.create(dto);
 
-    return new BookResponse(book, book.translations, book.parameters);
+    return new BookResponse(book, translations, parameters);
   }
 
   @Version('1')
@@ -68,11 +56,7 @@ export class BookController {
   public async findAll(
     @Query() query: GetAllBooksRequest,
   ): Promise<AllBooksResponse> {
-    const payload = instanceToPlain(query);
-    const result = await this.serviceHandler.send('getAll', payload);
-
-    const books = result as GetAllBooksResponse;
-
+    const books = await this.service.getAll(query);
     return new AllBooksResponse(books, query.page, query.size);
   }
 
@@ -83,11 +67,7 @@ export class BookController {
     @Param('id') id: string,
     @Query('lng') lng: I18nEnum = I18nEnum.EN,
   ): Promise<BookResponse> {
-    const payload = { id, i18n: lng };
-    const result = await this.serviceHandler.send('getOne', payload);
-
-    const book = result as Book;
-
+    const book = await this.service.getOne(id, lng);
     return new BookResponse(book, book.translations, book.parameters);
   }
 
@@ -110,10 +90,7 @@ export class BookController {
       );
     }
 
-    const payload = { id, i18n, dto };
-    const result = await this.serviceHandler.send('update', payload);
-
-    const book = result as Book;
+    const book = await this.service.update(id, i18n, dto);
 
     return new BookResponse(book, book.translations);
   }
@@ -126,10 +103,7 @@ export class BookController {
     @Param('id') id: string,
     @Body() dto: AddI18nRequest,
   ): Promise<BookResponse> {
-    const payload = { id, dto };
-    const result = await this.serviceHandler.send('addI18n', payload);
-
-    const book = result as Book;
+    const book = await this.service.addI18n(id, dto);
 
     return new BookResponse(book, book.translations);
   }
@@ -139,11 +113,7 @@ export class BookController {
   @Delete('/:id')
   @UseGuards(AuthGuard)
   public async remove(@Param('id') id: string) {
-    const payload = id;
-    const result = await this.serviceHandler.send('destroy', payload);
-
-    const book = result as Book;
-
+    const book = await this.service.destroy(id);
     return new BookResponse(book);
   }
 }

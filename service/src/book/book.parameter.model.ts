@@ -1,20 +1,20 @@
-import { I18nEnum } from 'enums/i18n.enum';
 import {
   BelongsTo,
   Column,
   DataType,
   ForeignKey,
+  Model,
   PrimaryKey,
   Table,
-  Model,
 } from 'sequelize-typescript';
-import { Book } from 'src/book/book.model';
+import { Book } from './book.model';
+import { I18nEnum } from 'enums/I18n.enum';
 
 @Table({
-  tableName: 'book_i18n',
+  tableName: 'book_parameters',
   timestamps: true,
 })
-export class BookI18n extends Model<BookI18n> {
+export class BookParameter extends Model<BookParameter> {
   @PrimaryKey
   @Column({
     type: DataType.ENUM(...(Object.values(I18nEnum) as string[])),
@@ -22,28 +22,27 @@ export class BookI18n extends Model<BookI18n> {
   })
   i18n: I18nEnum;
 
-  @PrimaryKey
-  @ForeignKey(() => Book)
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: false,
+  })
+  label: string;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: false,
+  })
+  value: string;
+
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
+  @ForeignKey(() => Book)
   bookId: string;
 
   @BelongsTo(() => Book)
   book: Book;
-
-  @Column({
-    type: DataType.STRING(100),
-    allowNull: false,
-  })
-  title: string;
-
-  @Column({
-    type: DataType.TEXT,
-    allowNull: true,
-  })
-  description: string;
 
   @Column({
     type: DataType.DATE,

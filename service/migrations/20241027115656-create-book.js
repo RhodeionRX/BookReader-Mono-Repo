@@ -10,7 +10,7 @@ module.exports = {
         unique: true,
         type: Sequelize.UUID,
       },
-      creator_account_id: {
+      creatorAccountId: {
         type: Sequelize.UUID,
         allowNull: true,
       },

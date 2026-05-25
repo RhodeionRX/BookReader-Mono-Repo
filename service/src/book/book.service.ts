@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Book } from './book.model';
-import { InitBookDto } from './dto/init-book.dto';
-import { RpcException } from '@nestjs/microservices';
-import { GetAllBooksDto } from './dto/get-all-book.dto';
-import { UpdateBookDto } from './dto/update-book.dto';
-import { I18nEnum } from 'enums/i18n.enum';
-import { AddI18nDto } from './dto/add-i18n.dto';
+import { InitBookDto } from './models/dto/init-book.dto';
+import { GetAllBooksDto } from './models/dto/get-all-book.dto';
+import { AddI18nDto } from './models/dto/add-i18n.dto';
 import { BookRepository } from './book.repository';
 import { BookParameter } from './book.parameter.model';
 import { BookI18n } from './book.i18n.model';
+import { I18nEnum } from 'enums/I18n.enum';
+import { UpdateBookRequest } from './models/request';
+import { Book } from './book.model';
 
 @Injectable()
 export class BookService {
@@ -19,12 +18,12 @@ export class BookService {
       const { articul, userId, title, i18n, description, parameters } = dto;
 
       const book = await this.repository.create({
-        creator_account_id: userId,
+        creatorAccountId: userId,
         articul,
       });
 
       if (!book) {
-        throw new RpcException('Book is not created');
+        throw new Error('Book is not created');
       }
 
       const translations = await this.repository.addI18n({
@@ -45,23 +44,23 @@ export class BookService {
       }
 
       const result = {
-        ...book.toJSON(),
+        book,
         translations,
         ...(bookParameters && { parameters: bookParameters }),
       };
 
       return result;
     } catch (error) {
-      throw new RpcException(error.message ?? 'Unknown exception');
+      throw new Error(error.message ?? 'Unknown exception');
     }
   }
 
   public async getAll(dto: GetAllBooksDto) {
-    const { creator_account_id, title, i18n, articul, size, page } = dto;
+    const { creatorAccountId, title, i18n, articul, size, page } = dto;
     const localization = i18n ?? I18nEnum.EN;
 
     const books = await this.repository.find({
-      creator_account_id,
+      creatorAccountId,
       title,
       articul,
       size,
@@ -94,12 +93,12 @@ export class BookService {
     return bookWithSpecifiedI18n;
   }
 
-  public async update(id: string, i18n: I18nEnum, dto: UpdateBookDto) {
+  public async update(id: string, i18n: I18nEnum, dto: UpdateBookRequest) {
     try {
       const { articul } = dto;
 
       const book = await this.repository.update(id, { articul });
-      const translations = await this.repository.updateI18n(id, i18n, dto);
+      const translations = await this.repository.updateI18n(id, i18n, {...dto});
 
       const result = {
         ...book.toJSON(),
@@ -108,7 +107,7 @@ export class BookService {
 
       return result;
     } catch (error) {
-      throw new RpcException(error.message ?? 'Unknown exception');
+      throw new Error(error.message ?? 'Unknown exception');
     }
   }
 
@@ -121,7 +120,7 @@ export class BookService {
       );
 
       if (bookI18nCandidate) {
-        throw new RpcException('This localization already added');
+        throw new Error('This localization already added');
       }
 
       const translations = await this.repository.addI18n({
@@ -136,7 +135,7 @@ export class BookService {
 
       return result;
     } catch (error) {
-      throw new RpcException(error.message ?? 'Unknown exception');
+      throw new Error(error.message ?? 'Unknown exception');
     }
   }
 

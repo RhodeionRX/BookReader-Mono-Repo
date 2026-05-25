@@ -1,7 +1,7 @@
-import { I18nEnum } from 'enums/i18n.enum';
+import { I18nEnum } from "enums/I18n.enum";
 
 export interface IFindBooksParams {
-  creator_account_id?: string;
+  creatorAccountId?: string;
   title?: string;
   articul?: string;
   size?: number;

@@ -1,4 +1,3 @@
-import { GetAllBooksResponse } from '../interfaces';
 import { BookResponse } from './book.response';
 
 export class AllBooksResponse {
@@ -8,7 +7,7 @@ export class AllBooksResponse {
   pageTotal: number;
 
   constructor(
-    { rows, count }: GetAllBooksResponse,
+    { rows, count }: any, // TODO: fix any type
     page: number,
     size: number,
   ) {

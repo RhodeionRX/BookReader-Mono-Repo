@@ -1,5 +1,5 @@
-import { I18nEnum } from 'enums/i18n.enum';
-import { IParameter } from '../interfaces';
+import { I18nEnum } from 'enums/I18n.enum';
+import { IParameter } from '../../interfaces';
 
 export class InitBookDto {
   public readonly userId: string;
@@ -7,5 +7,5 @@ export class InitBookDto {
   public readonly title: string;
   public readonly description?: string;
   public readonly articul?: string;
-  public readonly parameters: IParameter[];
+  public readonly parameters?: IParameter[];
 }

@@ -5,7 +5,7 @@ import { I18nEnum } from 'enums/I18n.enum';
 export class GetAllBooksRequest {
   @IsUUID()
   @IsOptional()
-  creator_account_id?: string;
+  creatorAccountId?: string;
 
   @IsString()
   @IsOptional()

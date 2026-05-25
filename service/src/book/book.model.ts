@@ -36,7 +36,7 @@ export class Book extends Model<Book> {
     type: DataType.UUIDV4,
     allowNull: true,
   })
-  creator_account_id: string;
+  creatorAccountId: string;
 
   @Column({
     type: DataType.DATE,

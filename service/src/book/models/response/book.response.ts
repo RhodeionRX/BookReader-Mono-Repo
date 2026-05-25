@@ -1,5 +1,7 @@
 import { I18nEnum } from 'enums/I18n.enum';
-import { Book, BookParameter, BookTranslation } from '../entity';
+import { BookI18n } from 'src/book/book.i18n.model';
+import { Book } from 'src/book/book.model';
+import { BookParameter } from 'src/book/book.parameter.model';
 
 export class BookResponse {
   id: string;
@@ -13,8 +15,8 @@ export class BookResponse {
   updatedAt: Date;
 
   constructor(
-    book: Book,
-    translations?: BookTranslation[] | BookTranslation,
+    book: any, // TODO: make type with filled Book
+    translations?: BookI18n[] | BookI18n,
     parameters?: BookParameter[],
   ) {
     this.id = book.id;
@@ -37,7 +39,7 @@ export class BookResponse {
       }));
     }
 
-    this.creatorAccountId = book.creator_account_id;
+    this.creatorAccountId = book.creatorAccountId;
     this.createdAt = book.createdAt;
     this.updatedAt = book.updatedAt;
   }
