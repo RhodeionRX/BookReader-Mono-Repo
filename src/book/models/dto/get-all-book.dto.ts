@@ -1,7 +1,7 @@
-import { I18nEnum } from "enums/I18n.enum";
+import { I18nEnum } from 'enums/I18n.enum';
 
 export class GetAllBooksDto {
-  creatorAccountId?: string;
+  creatorUserId?: string;
   title?: string;
   i18n?: I18nEnum;
   articul?: string;

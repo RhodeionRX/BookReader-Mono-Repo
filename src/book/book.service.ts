@@ -18,7 +18,7 @@ export class BookService {
       const { articul, userId, title, i18n, description, parameters } = dto;
 
       const book = await this.repository.create({
-        creatorAccountId: userId,
+        creatorUserId: userId,
         articul,
       });
 
@@ -56,11 +56,11 @@ export class BookService {
   }
 
   public async getAll(dto: GetAllBooksDto) {
-    const { creatorAccountId, title, i18n, articul, size, page } = dto;
+    const { creatorUserId, title, i18n, articul, size, page } = dto;
     const localization = i18n ?? I18nEnum.EN;
 
     const books = await this.repository.find({
-      creatorAccountId,
+      creatorUserId,
       title,
       articul,
       size,

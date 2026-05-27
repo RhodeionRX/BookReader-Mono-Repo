@@ -1,13 +1,12 @@
 import { I18nEnum } from 'enums/I18n.enum';
 import { BookI18n } from 'src/book/book.i18n.model';
-import { Book } from 'src/book/book.model';
 import { BookParameter } from 'src/book/book.parameter.model';
 
 export class BookResponse {
   id: string;
   title: string;
   description?: string;
-  creatorAccountId: string;
+  creatorUserId: string;
   articul?: string;
   i18n: I18nEnum;
   parameters?: Pick<BookParameter, 'label' | 'value'>[];
@@ -39,7 +38,7 @@ export class BookResponse {
       }));
     }
 
-    this.creatorAccountId = book.creatorAccountId;
+    this.creatorUserId = book.creatorUserId;
     this.createdAt = book.createdAt;
     this.updatedAt = book.updatedAt;
   }

@@ -27,7 +27,7 @@ export class BookRepository {
    * Creates a new book entity in the database.
    *
    * @param {Object} data - Parameters to search for a book.
-   * @param {string} [data.creatorAccountId] - The ID of the account that created the book.
+   * @param {string} [data.creatorUserId] - The ID of the user that created the book.
    * @param {string} [data.articul] - The unique article identifier of the book.
    *
    * @returns {Promise<Book|null>} - Returns the found book object if exists, otherwise `null`.
@@ -35,7 +35,7 @@ export class BookRepository {
    * // Create a new book
    * const book = await create({
    *   articul: 'BOOK-002',
-   *   creatorAccountId: '123e4567-e89b-12d3-a456-426614174000',
+   *   creatorUserId: '123e4567-e89b-12d3-a456-426614174000',
    * });
    */
   public async create(data: CreationAttributes<Book>): Promise<Book | null> {
@@ -143,7 +143,7 @@ export class BookRepository {
    * Searches for a single book entry in the database using the provided criteria.
    * @param {Object} data - Parameters to search for a book.
    * @param {string} [data.id] - The unique identifier of the book.
-   * @param {string} [data.creatorAccountId] - The ID of the account that created the book.
+   * @param {string} [data.creatorUserId] - The ID of a user that created the book.
    * @param {Date} [data.createdAt] - The timestamp when the book was created.
    * @param {string} [data.articul] - The unique article identifier of the book.
    * @param {I18nEnum} [data.i18n]  - The identificator of book's internationalization
@@ -156,16 +156,16 @@ export class BookRepository {
    *
    * @example
    * // Find a book by creator's account ID and article
-   * const book = await findOne({ creatorAccountId: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
+   * const book = await findOne({ creatorUserId: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
    *
    */
 
   public async findOne(data: IFindOneBookParams): Promise<Book | null> {
-    const { id, creatorAccountId, createdAt, articul, i18n } = data;
+    const { id, creatorUserId, createdAt, articul, i18n } = data;
 
     const whereClause = {
       ...(id && { id }),
-      ...(creatorAccountId && { creatorAccountId }),
+      ...(creatorUserId && { creatorUserId }),
       ...(articul && { articul }),
       ...(createdAt && { createdAt }),
     };
@@ -194,7 +194,7 @@ export class BookRepository {
    * Searches for a single book entry in the database using the provided criteria.
    * @param {Object} data - Parameters to search for a book.
    * @param {string} [data.id] - The unique identifier of the book.
-   * @param {string} [data.creatorAccountId] - The ID of the account that created the book.
+   * @param {string} [data.creatorUserId] - The ID of a user that created the book.
    * @param {Date} [data.createdAt] - The timestamp when the book was created.
    * @param {string} [data.articul] - The unique article identifier of the book.
    *
@@ -205,7 +205,7 @@ export class BookRepository {
    *
    * @example
    * // Find a book by creator's account ID and article
-   * const book = await findOne({ creatorAccountId: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
+   * const book = await findOne({ creatorUserId: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
    *
    * @throws {Error} If the query fails or the parameters are invalid
    */
@@ -224,7 +224,7 @@ export class BookRepository {
    *
    * Searches for book entries in the database using the provided criteria.
    * @param {Object} params - Parameters to search for a book.
-   * @param {string} [params.creatorAccountId] - The ID of the account that created the book.
+   * @param {string} [params.creatorUserId] - The ID of a user that created the book.
    * @param {string} [params.title] - The book's title.
    * @param {I18nEnum} [params.i18n] - The book localization, searches for books having specified localization.
    * @param {string} [params.articul] - The unique article identifier of the book.
@@ -238,16 +238,16 @@ export class BookRepository {
    *
    * @example
    * // Find books by creator's account ID and article
-   * const books = await find({ creatorAccountId: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
+   * const books = await find({ creatorUserId: '123e4567-e89b-12d3-a456-426614174000', articul: 'BOOK-001' });
    *
    * @throws {Error} If the query fails or the parameters are invalid
    */
 
   public async find(params: IFindBooksParams): Promise<IFindBooksResponse> {
-    const { creatorAccountId, title, articul, size = 10, page = 1 } = params;
+    const { creatorUserId, title, articul, size = 10, page = 1 } = params;
 
     const whereClause = {
-      ...(creatorAccountId && { creatorAccountId }),
+      ...(creatorUserId && { creatorUserId }),
       ...(articul && { [Op.eq]: articul }),
     };
 
